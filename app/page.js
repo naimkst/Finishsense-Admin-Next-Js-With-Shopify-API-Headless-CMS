@@ -4,21 +4,21 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import SideBarMenu from "../components/Sidebar";
 import Header from "../components/Header";
-import pImg from "/public/images/product.png";
 import Image from "next/image";
-import { client } from "@/hooks/shopify";
+import { client } from "@/lib/shopify";
+import Link from "next/link";
+import { Loader } from "@/components/Loader";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(null);
 
   useState(() => {
     client.product.fetchAll().then((products) => {
-      // Do something with the products
       setProducts(products);
     });
   }, []);
 
-  console.log(products);
+  if (!products) return <Loader />;
 
   return (
     <div className="page-wrapper">
@@ -39,47 +39,50 @@ const Home = () => {
                 <div className="product-items">
                   {products.map((item, index) => (
                     <div key={`product-${index}`} className="product-item-wrap">
-                      <div className="product-item">
-                        <div className="product-img">
-                          <Image
-                            src={item?.images[0]?.src}
-                            width={item?.images[0]?.width}
-                            height={item?.images[0]?.height}
-                            alt=""
-                          />
-                        </div>
-                        <div className="product-text">
-                          <h3>{item?.title}</h3>
-                          <ul>
-                            {item?.variants[0]?.sku && (
-                              <li>Part Number: {item?.variants[0]?.sku}</li>
-                            )}
-                            {item?.vendor && (
-                              <li>Manufacturer: {item?.vendor}</li>
-                            )}
-                            <li>
-                              List Price:{" "}
-                              {item?.variants[0]?.compareAtPrice
-                                ?.currencyCode == "USD"
-                                ? "$"
-                                : item?.variants[0]?.compareAtPrice
-                                    ?.currencyCode}
-                              {item?.variants[0]?.compareAtPrice?.amount
-                                ? item?.variants[0]?.compareAtPrice?.amount
-                                : item?.variants[0]?.price?.amount}
-                            </li>
-                            <li>
-                              Net Price:{" "}
-                              <strong>
-                                {item?.variants[0]?.price?.currencyCode == "USD"
+                      <Link href={`/product/${item.handle}`}>
+                        <div className="product-item">
+                          <div className="product-img">
+                            <Image
+                              src={item?.images[0]?.src}
+                              width={item?.images[0]?.width}
+                              height={item?.images[0]?.height}
+                              alt={item?.title}
+                            />
+                          </div>
+                          <div className="product-text">
+                            <h3>{item?.title}</h3>
+                            <ul>
+                              {item?.variants[0]?.sku && (
+                                <li>Part Number: {item?.variants[0]?.sku}</li>
+                              )}
+                              {item?.vendor && (
+                                <li>Manufacturer: {item?.vendor}</li>
+                              )}
+                              <li>
+                                List Price:{" "}
+                                {item?.variants[0]?.compareAtPrice
+                                  ?.currencyCode == "USD"
                                   ? "$"
-                                  : item?.variants[0]?.price?.currencyCode}
-                                {item?.variants[0]?.price?.amount}
-                              </strong>
-                            </li>
-                          </ul>
+                                  : item?.variants[0]?.compareAtPrice
+                                      ?.currencyCode}
+                                {item?.variants[0]?.compareAtPrice?.amount
+                                  ? item?.variants[0]?.compareAtPrice?.amount
+                                  : item?.variants[0]?.price?.amount}
+                              </li>
+                              <li>
+                                Net Price:{" "}
+                                <strong>
+                                  {item?.variants[0]?.price?.currencyCode ==
+                                  "USD"
+                                    ? "$"
+                                    : item?.variants[0]?.price?.currencyCode}
+                                  {item?.variants[0]?.price?.amount}
+                                </strong>
+                              </li>
+                            </ul>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     </div>
                   ))}
                 </div>

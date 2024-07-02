@@ -6,3 +6,8 @@
   padding: 0 5px;
   border-radius: 8px;
 }
+.product-details .product-details-bottom .product-details-img {
+  position: relative;
+  height: 295px;
+  width: 285px;
+}

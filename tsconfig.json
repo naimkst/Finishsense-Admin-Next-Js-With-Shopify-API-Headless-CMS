@@ -21,6 +21,15 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/layout.js", "app/layout.js", "app/page.js", "hooks/shopify.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/layout.js",
+    "app/layout.js",
+    "app/page.js",
+    "lib/shopify.js"
+, "pages/api/hello.js", "lib/nodeAPi.js"  ],
   "exclude": ["node_modules"]
 }
