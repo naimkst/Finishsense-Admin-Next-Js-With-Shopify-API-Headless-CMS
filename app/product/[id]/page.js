@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Button } from "@mui/material";
 import Link from "next/link";
 import "react-perfect-scrollbar/dist/css/styles.css";
@@ -13,19 +13,35 @@ import { useParams } from "next/navigation";
 import { Loader } from "@/components/Loader";
 import { createAdminRestApiClient } from "@shopify/admin-api-client";
 import { metafield } from "@/lib/helpers";
+import useFetch from "@/hooks/useFetch";
+import { useProductInfo } from "@/stores/product-store";
 
 const productDetails = () => {
   const [qty, setQty] = useState(1);
   const [products, setProducts] = useState(null);
-  const [metafields, setMetafields] = useState([]);
+  const [getInfo, setProductInfo] = useState([]);
   const router = useParams();
+  const { product, update } = useProductInfo();
 
-  useState(() => {
-    // client.product.fetchByHandle(router.id).then((product) => {
-    //   setProducts(product);
-    // });
-    const fetchMetafields = async () => {
-      const data = await fetch("/api/hello", {
+  const {
+    loading,
+    error,
+    data: getProductInfo,
+  } = useFetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/product-infos?populate=deep`
+  );
+
+  // console.log(
+  //   "====-=-=-=-=-=-=-=",
+  //   info?.find(
+  //     (item) =>
+  //       item?.attributes?.product_info?.Product?.handle === products?.handle
+  //   )
+  // );
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      await fetch("/api/hello", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,24 +49,32 @@ const productDetails = () => {
         body: JSON.stringify({ id: router?.id }),
       })
         .then((response) =>
-          response.json().then((data) => setProducts(data?.data))
+          response.json().then((data) => {
+            setProducts(data?.data);
+          })
         )
         .catch((error) => {
           console.error("Failed to fetch product metafields:", error);
         });
     };
-
-    fetchMetafields();
+    fetchProducts();
   }, [router.id]);
 
-  console.log(router?.id);
+  useEffect(() => {
+    update(getProductInfo);
 
-  console.log(metafield(products, "accessories"));
+    if (product) {
+      const getInfoData = product?.data?.find(
+        (item) => item?.attributes?.product_info?.Product?.handle === router.id
+      );
+      setProductInfo(getInfoData);
+    }
+  }, [getProductInfo, router.id]);
 
   if (products) {
     // Create an empty checkout
     client.checkout.create().then((checkout) => {
-      console.log("checkout ", checkout);
+      // console.log("checkout ", checkout);
       const lineItemsToAdd = [
         {
           variantId: products?.variants?.edges[0].node.id,
@@ -63,17 +87,20 @@ const productDetails = () => {
         .addLineItems(checkout?.id, lineItemsToAdd)
         .then((checkout) => {
           // Do something with the updated checkout
-          console.log("=======", checkout?.lineItems); // Array with one additional line item
+          // console.log("=======", checkout?.lineItems);
+          // Array with one additional line item
         });
 
       client.checkout.fetch(checkout?.id).then((checkout) => {
         // Do something with the checkout
-        console.log("444444", checkout);
+        // console.log("444444", checkout);
       });
     });
   }
 
-  if (!products) return <Loader />;
+  console.log("product====", getInfo);
+
+  if (!products || loading) return <Loader />;
 
   return (
     <div className="page-wrapper">
@@ -106,6 +133,7 @@ const productDetails = () => {
                         fill="true"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         alt={products?.title}
+                        position="relative"
                       />
                     </span>
                   </div>
@@ -167,8 +195,8 @@ const productDetails = () => {
                 </div>
               </div>
             </div>
-            <Documentation data={products} />
-            <Productinfo data={products} />
+            <Documentation data={products} info={getInfo} />
+            <Productinfo data={products} info={getInfo} />
           </div>
         </div>
       </div>

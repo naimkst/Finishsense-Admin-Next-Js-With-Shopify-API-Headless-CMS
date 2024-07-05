@@ -17,14 +17,12 @@ import { stringify } from "querystring";
 import rehypeRaw from "rehype-raw";
 import { metafield } from "@/lib/helpers";
 
-const Productinfo = ({ data }) => {
+const Productinfo = ({ data, info }) => {
   const [activeTab, setActiveTab] = useState("1");
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
-
-  console.log(stringify(data?.descriptionHtml));
 
   return (
     <div className="col-lg-12">
