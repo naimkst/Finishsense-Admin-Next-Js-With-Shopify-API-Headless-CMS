@@ -7,7 +7,6 @@ export const metafield = (data: any, key: any) => {
 };
 
 export function showImage(item: any, loop?: any) {
-  // console.log(item, "Image show");
   {
     if (item) {
       if (loop) {

@@ -5,7 +5,7 @@ import "react-perfect-scrollbar/dist/css/styles.css";
 import SideBarMenu from "../components/Sidebar";
 import Header from "../components/Header";
 import Image from "next/image";
-import { client } from "@/lib/shopify";
+import { client } from "@/lib/shopifyBuy";
 import Link from "next/link";
 import { Loader } from "@/components/Loader";
 

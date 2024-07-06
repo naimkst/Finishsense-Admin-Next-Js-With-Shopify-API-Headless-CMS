@@ -8,10 +8,9 @@ import Header from "../../../components/Header";
 import Image from "next/image";
 import Documentation from "../documentation";
 import Productinfo from "../Productinfo";
-import { client } from "@/lib/shopify";
+import { client } from "@/lib/shopifyBuy";
 import { useParams } from "next/navigation";
 import { Loader } from "@/components/Loader";
-import { createAdminRestApiClient } from "@shopify/admin-api-client";
 import { metafield } from "@/lib/helpers";
 import useFetch from "@/hooks/useFetch";
 import { useProductInfo } from "@/stores/product-store";
@@ -30,14 +29,6 @@ const productDetails = () => {
   } = useFetch(
     `${process.env.NEXT_PUBLIC_API_URL}/product-infos?populate=deep`
   );
-
-  // console.log(
-  //   "====-=-=-=-=-=-=-=",
-  //   info?.find(
-  //     (item) =>
-  //       item?.attributes?.product_info?.Product?.handle === products?.handle
-  //   )
-  // );
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -97,8 +88,6 @@ const productDetails = () => {
       });
     });
   }
-
-  console.log("product====", getInfo);
 
   if (!products || loading) return <Loader />;
 

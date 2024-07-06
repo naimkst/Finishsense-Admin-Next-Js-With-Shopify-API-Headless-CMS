@@ -30,7 +30,7 @@ const Documentation = ({ data, info }) => {
       <div className="card-design doc-details">
         <Nav tabs>
           {infoData?.InfoFiles?.map((item, index) => (
-            <NavItem>
+            <NavItem key={`documentId-${index}`}>
               <NavLink
                 className={classnames({ active: activeTab == index + 1 })}
                 onClick={() => {

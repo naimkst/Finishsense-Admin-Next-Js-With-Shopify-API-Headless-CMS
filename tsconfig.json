@@ -29,7 +29,7 @@
     "app/layout.js",
     "app/layout.js",
     "app/page.js",
-    "lib/shopify.js"
-, "pages/api/hello.js", "lib/nodeAPi.js"  ],
+    "lib/shopifyBuy.js"
+, "pages/api/hello.js", "lib/shopify.js"  ],
   "exclude": ["node_modules"]
 }

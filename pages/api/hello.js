@@ -1,4 +1,4 @@
-import { shopify } from "@/lib/nodeAPi";
+import { shopify } from "@/lib/shopify";
 import { gql, request } from "graphql-request";
 
 export default async function hello(req, res) {
@@ -82,6 +82,5 @@ export default async function hello(req, res) {
       handle: id,
     },
   });
-  console.log("@@@@@@@@@@@@@@@", data);
   res.status(200).json({ data: data?.productByHandle, errors: errors });
 }
