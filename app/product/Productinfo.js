@@ -24,13 +24,16 @@ const Productinfo = ({ data, info }) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
 
+  const infoData = info?.attributes?.product_info?.ProductTab;
+  console.log("infoData", info?.attributes?.product_info?.ProductTab);
+
   return (
     <div className="col-lg-12">
       <div className="card-design doc-details details-bottom">
         <Nav tabs>
           <NavItem>
             <NavLink
-              className={classnames({ active: activeTab === "1" })}
+              className={classnames({ active: activeTab == "1" })}
               onClick={() => {
                 toggle("1");
               }}
@@ -38,36 +41,19 @@ const Productinfo = ({ data, info }) => {
               PRODUCT DETAILS
             </NavLink>
           </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: activeTab === "2" })}
-              onClick={() => {
-                toggle("2");
-              }}
-            >
-              SPECIFICATIONS
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: activeTab === "3" })}
-              onClick={() => {
-                toggle("3");
-              }}
-            >
-              SPARE PARTS
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: activeTab === "4" })}
-              onClick={() => {
-                toggle("4");
-              }}
-            >
-              ACCESSORIES
-            </NavLink>
-          </NavItem>
+
+          {infoData?.map((item, index) => (
+            <NavItem key={`tabs-${index}`}>
+              <NavLink
+                className={classnames({ active: activeTab == index + 2 })}
+                onClick={() => {
+                  toggle(index + 2);
+                }}
+              >
+                {item?.TabTitle}
+              </NavLink>
+            </NavItem>
+          ))}
         </Nav>
         <TabContent activeTab={activeTab}>
           <TabPane tabId="1">
@@ -79,31 +65,17 @@ const Productinfo = ({ data, info }) => {
               </div>
             </PerfectScrollbar>
           </TabPane>
-          <TabPane tabId="2">
-            <PerfectScrollbar>
-              <div className="details-wrap">
-                <ul>
-                  <li>Dangerous Good - false</li>
-                  <li>Pressure purging material - 109 psi</li>
-                  <li>Ambient temperature - 10 - 40 °C</li>
-                  <li>Rpm range - 0 - 200 rpm</li>
-                  <li>Typical rpm - 20 - 170 rpm</li>
-                  <li>Pressure difference, max. - 44 psi</li>
-                  <li>Ambient temperature US - 50 - 104 °F</li>
-                </ul>
-              </div>
-            </PerfectScrollbar>
-          </TabPane>
-          <TabPane tabId="3">
-            <PerfectScrollbar>
-              <div className="table-wrap"></div>
-            </PerfectScrollbar>
-          </TabPane>
-          <TabPane tabId="4">
-            <PerfectScrollbar>
-              <div className="table-wrap">{metafield(data, "accessories")}</div>
-            </PerfectScrollbar>
-          </TabPane>
+          {infoData?.map((item, index) => (
+            <TabPane key={`productTab-${index}`} tabId={index + 2}>
+              <PerfectScrollbar>
+                <div className="details-wrap">
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                    {item?.TabText}
+                  </ReactMarkdown>
+                </div>
+              </PerfectScrollbar>
+            </TabPane>
+          ))}
         </TabContent>
       </div>
     </div>

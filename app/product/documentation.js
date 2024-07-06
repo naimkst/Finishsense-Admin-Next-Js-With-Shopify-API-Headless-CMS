@@ -24,7 +24,6 @@ const Documentation = ({ data, info }) => {
   };
 
   const infoData = info?.attributes?.product_info;
-  console.log("infoData", infoData);
 
   return (
     <div className="col-lg-6">
