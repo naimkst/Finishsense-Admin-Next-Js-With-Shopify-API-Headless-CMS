@@ -1,5 +1,4 @@
 import { shopify } from "@/lib/shopify";
-import { gql, request } from "graphql-request";
 
 export default async function hello(req, res) {
   const id = req.body?.id;
