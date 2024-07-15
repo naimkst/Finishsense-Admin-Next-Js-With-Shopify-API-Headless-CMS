@@ -7,11 +7,7 @@ export default async function handler(req, res) {
 
   try {
     // Your Shopify Storefront API endpoint
-    const storefrontEndpoint =
-      "https://finishsense.myshopify.com/api/2024-07/graphql.json";
-
-    // Your Storefront API access token
-    const storefrontAccessToken = "97bfb5d62daae0f370a6caf752aae8d7";
+    const storefrontEndpoint = `https://${process.env.NEXT_PUBLIC_SHOPIFY_SHOP_NAME}/api/${process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION}/graphql.json`;
 
     // GraphQL query to authenticate the customer
     const query = `
@@ -39,7 +35,7 @@ export default async function handler(req, res) {
     const response = await fetch(storefrontEndpoint, {
       method: "POST",
       headers: {
-        "X-Shopify-Storefront-Access-Token": "97bfb5d62daae0f370a6caf752aae8d7",
+        "X-Shopify-Storefront-Access-Token": `${process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ query, variables }),

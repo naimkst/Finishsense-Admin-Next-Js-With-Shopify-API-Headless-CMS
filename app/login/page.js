@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 
 const LoginPage = (props) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const [value, setValue] = useState({
     email: "user@gmail.com",
@@ -34,7 +35,7 @@ const LoginPage = (props) => {
   );
 
   const submitForm = async (e) => {
-    console.log("submitForm", value);
+    setLoading(true);
     e.preventDefault();
     if (validator.allValid()) {
       setValue({
@@ -68,11 +69,13 @@ const LoginPage = (props) => {
         } else {
           //  setError(data.errors.map((error) => error.message).join(", "));
           toast.error("Invalid email or password!");
+          setLoading(false);
         }
       }
     } else {
       validator.showMessages();
       toast.error("Empty field is not allowed!");
+      setLoading(false);
     }
   };
 
@@ -109,9 +112,16 @@ const LoginPage = (props) => {
                   />
                   {validator.message("password", value.password, "required")}
                 </div>
-                <div className="form-field">
-                  <button type="submit">Login Now</button>
-                </div>
+                {!loading ? (
+                  <div className="form-field">
+                    <button type="submit">Login Now</button>
+                  </div>
+                ) : (
+                  <div className="form-field">
+                    <button type="">Loading...</button>
+                  </div>
+                )}
+
                 <div className="form-field forgot">
                   <Link href="/">Forgot Password?</Link>
                 </div>
