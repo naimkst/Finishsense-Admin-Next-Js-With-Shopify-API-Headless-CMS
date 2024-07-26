@@ -32,7 +32,7 @@ const productDetails = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      await fetch("/api/hello", {
+      await fetch("/api/singleProduct", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

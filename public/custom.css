@@ -10,4 +10,35 @@
   position: relative;
   height: 295px;
   width: 285px;
+  overflow: hidden;
+}
+.order-product-details-img {
+  padding-right: 15px;
+}
+.order-product-details-img img {
+  height: 290px;
+  width: 100%;
+  object-fit: cover;
+}
+.order-prd-list {
+  margin-bottom: 20px;
+}
+.productImage img {
+  height: 110px;
+  width: 150px;
+  object-fit: cover;
+  padding-right: 20px;
+}
+.leftProductDetails {
+  display: flex;
+  align-items: center;
+}
+.product-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.orderInfos {
+  display: flex;
+  flex-direction: column;
 }

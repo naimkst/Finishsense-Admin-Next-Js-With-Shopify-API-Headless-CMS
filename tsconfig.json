@@ -30,6 +30,6 @@
     "app/layout.js",
     "app/page.js",
     "lib/shopifyBuy.js"
-, "pages/api/hello.js", "lib/shopify.js"  ],
+, "pages/api/singleProduct.js", "lib/shopify.js"  ],
   "exclude": ["node_modules"]
 }

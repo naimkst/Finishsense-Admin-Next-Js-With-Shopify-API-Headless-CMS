@@ -5,24 +5,41 @@ import "react-perfect-scrollbar/dist/css/styles.css";
 import SideBarMenu from "../../components/Sidebar";
 import Header from "../../components/Header";
 import moment from "moment";
+import { Button, Grid } from "@mui/material";
+import Link from "next/link";
+import Image from "next/image";
+import { OrderDetails } from "@/components/OrderDetails";
 
-const Home = () => {
+const Orders = () => {
   const [orders, setOrders] = useState(null);
+  const [order, setOrder] = useState("ddd");
+  const [productDetails, setProductDetails] = useState(null);
   const [statusCheck, setStatusCheck] = useState("null");
   useEffect(() => {
     const fetchProducts = async () => {
-      await fetch("/api/orders")
-        .then((response) =>
-          response.json().then((data) => {
-            setOrders(data);
-          })
-        )
-        .catch((error) => {
-          console.error("Failed to fetch product metafields:", error);
-        });
+      try {
+        await fetch("/api/getOrders")
+          .then((response) =>
+            response.json().then((data) => {
+              console.log(data?.data?.edges);
+              setOrders(data?.data?.edges);
+            })
+          )
+          .catch((error) => {
+            console.error("Failed to fetch product metafields:", error);
+          });
+      } catch (error) {
+        console.log("Opps! Something went wrong");
+      }
     };
     fetchProducts();
   }, []);
+
+  const singleOrder = async (id) => {
+    const findSingleOrder = await orders.find((item) => item?.node?.name == id);
+    console.log(id, findSingleOrder?.node);
+    setOrder(findSingleOrder?.node);
+  };
 
   const orderStatus = (status) => {
     setStatusCheck(status.target.checked ? "fulfilled" : "null");
@@ -35,20 +52,7 @@ const Home = () => {
       <SideBarMenu />
       <div className="content-area">
         <div className="container-fluid">
-          <div className="product-area">
-            <div className="row">
-              <div className="col-12">
-                <div className="top-title">
-                  <h3>Order Detail</h3>
-                </div>
-              </div>
-            </div>
-            <PerfectScrollbar>
-              <div className="product-wrap order-details">
-                <h2>Order 1654436</h2>
-              </div>
-            </PerfectScrollbar>
-          </div>
+          {order && <OrderDetails order={order} orders={orders} />}
           <div className="product-area doc-details mt-3 order-details">
             <div className="row">
               <div className="col-12">
@@ -57,7 +61,7 @@ const Home = () => {
 
                   <div className="open-order">
                     <h4>Open Orders</h4>
-                    <div class="center">
+                    <div className="center">
                       <input type="checkbox" onChange={(e) => orderStatus(e)} />
                     </div>
                   </div>
@@ -75,55 +79,78 @@ const Home = () => {
                             <td className="product">
                               <div className="info">
                                 <div className="icon">
-                                  <i className="icon-ico"></i>
+                                  <Image
+                                    src={
+                                      item?.node?.lineItems?.edges[0]?.node
+                                        ?.image?.url
+                                    }
+                                    width={50}
+                                    height={50}
+                                    className="p-2"
+                                    alt=""
+                                  />
+                                  {/* <i className="icon-ico"></i> */}
                                 </div>
                                 <div className="text">
-                                  <h4>{item?.name}</h4>
-                                  <span>Sales</span>
+                                  <h4>{item?.node?.name}</h4>
+                                  {/* <span>Sales</span> */}
                                 </div>
                               </div>
                             </td>
                             <td className="date">
                               <b>
-                                {item?.currency == "USD" ? "$" : item?.currency}
-                                {item?.current_subtotal_price}
+                                {item?.node?.totalPriceSet?.presentmentMoney
+                                  ?.currencyCode == "USD"
+                                  ? "$"
+                                  : item?.node?.totalPriceSet?.presentmentMoney
+                                      ?.currencyCode}
+                                {
+                                  item?.node?.totalPriceSet?.presentmentMoney
+                                    ?.amount
+                                }
                               </b>
                               <span>Amount</span>
                             </td>
                             <td className="date">
                               <b>
-                                {moment(item?.updated_at).format("DD MMM YYY")}
+                                {moment(item?.node?.updated_at).format(
+                                  "DD MMM YYY"
+                                )}
                               </b>
                               <span>Date</span>
                             </td>
                             <td className="date">
-                              <b>{item?.order_number}</b>
-                              <span>Order Number</span>
+                              <b>{item?.node?.lineItems?.edges?.length}</b>
+                              <span>Products</span>
                             </td>
                             <td className="date">
                               <b>
-                                {`${item?.billing_address?.first_name} ${item?.billing_address?.last_name}`}{" "}
+                                {`${item?.node?.billingAddress?.firstName} ${item?.node?.billingAddress?.lastName}`}{" "}
                               </b>
-                              <span>Purchaser</span>
+                              <span>User Name</span>
                             </td>
                             <td className="date">
-                              <b>{item?.token}</b>
-                              <span>UPS</span>
+                              <b>{item?.node?.billingAddress?.phone}</b>
+                              <span>Phone Number</span>
                             </td>
                             <td className="action-btn">
                               <span
                                 className={
-                                  item?.fulfillment_status == "fulfilled"
+                                  item?.node?.fulfillable == true
                                     ? "complete"
                                     : ""
                                 }
                               >
-                                {item?.fulfillment_status == "fulfilled"
-                                  ? "Completed"
-                                  : "Pending"}
+                                {item?.node?.fulfillable == false
+                                  ? `${"Pending"}`
+                                  : `${"Shipping "}`}
                               </span>
                               <button>
-                                <i className="fa fa-eye" aria-hidden="true"></i>
+                                <i
+                                  onClick={() => singleOrder(item?.node?.name)}
+                                  className="fa fa-eye"
+                                  aria-hidden="true"
+                                ></i>
                               </button>
                             </td>
                           </tr>
@@ -140,4 +167,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Orders;

@@ -1,8 +1,8 @@
 const Shopify = require("shopify-api-node");
 
 const shopifyApiNode = new Shopify({
-  shopName: "finishsense.myshopify.com",
-  accessToken: "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",
+  shopName: `${process.env.NEXT_PUBLIC_SHOPIFY_SHOP_NAME}`,
+  accessToken: `${process.env.NEXT_PUBLIC_SHOPIFY_PRIVATE_ACCESS_TOKEN}`,
 });
 
 export default async function orders(req, res) {
