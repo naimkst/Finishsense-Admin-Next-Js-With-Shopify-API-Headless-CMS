@@ -1,7 +1,7 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 
-export const OrderDetails = ({ order, orders }: any) => {
+export const OrderDetails = ({ order, orders, closeTooltip }: any) => {
   return (
     <div className="product-area">
       <div className="row">
@@ -11,13 +11,17 @@ export const OrderDetails = ({ order, orders }: any) => {
           </div>
         </div>
       </div>
+      <a className="close" onClick={closeTooltip}>
+        &times;
+      </a>
+
       <PerfectScrollbar>
         <div className="product-wrap order-details">
           <h2>Order {order?.name}</h2>
 
           <div className="order-details-top">
             <div className="row">
-              <div className="col-lg-8">
+              <div className="col-lg-7">
                 {order?.lineItems?.edges?.map((prd: any, index: number) => (
                   <div key={`itemsPrd-${index}`} className="order-prd-list">
                     <div className="product-info">
@@ -57,7 +61,7 @@ export const OrderDetails = ({ order, orders }: any) => {
                 ))}
               </div>
 
-              <div className="col-lg-4">
+              <div className="col-lg-5">
                 <div className="orderSummary">
                   {order?.lineItems?.edges?.map((prd: any, index: number) => (
                     <div key={`sum-${index}`} className="orderDetailsSum">
@@ -96,8 +100,31 @@ export const OrderDetails = ({ order, orders }: any) => {
                   ))}
 
                   <div className="priceBoxSum">
-                    <p className="SubTotal">Subtotal: </p>
-                    <p className="grandTotal">Grand Total: </p>
+                    <p className="SubTotal">
+                      <span>Subtotal: </span>
+                      <span>
+                        {order?.subtotalPriceSet?.presentmentMoney
+                          ?.currencyCode == "USD"
+                          ? "$"
+                          : order?.subtotalPriceSet?.presentmentMoney}
+                        {order?.subtotalPriceSet?.presentmentMoney?.amount}
+                      </span>
+                    </p>
+                    <p className="grandTotal">
+                      <span>Grand Total: </span>
+                      <span>
+                        {order?.totalPriceSet?.presentmentMoney?.currencyCode ==
+                        "USD"
+                          ? "$"
+                          : order?.totalPriceSet?.presentmentMoney}
+                        {order?.totalPriceSet?.presentmentMoney?.amount}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="orderButton">
+                    <a className="cart-btn" href="/">
+                      {order?.fullyPaid ? "Paid" : "Unpaid"}
+                    </a>
                   </div>
                 </div>
               </div>

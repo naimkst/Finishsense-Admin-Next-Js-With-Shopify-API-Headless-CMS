@@ -25,6 +25,7 @@
     "react-markdown": "^8.0.7",
     "react-perfect-scrollbar": "^1.5.8",
     "react-toastify": "^10.0.5",
+    "reactjs-popup": "^2.0.6",
     "reactstrap": "^9.2.2",
     "rehype-raw": "^7.0.0",
     "sass": "^1.77.4",

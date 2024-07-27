@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import SideBarMenu from "../../components/Sidebar";
@@ -9,8 +9,14 @@ import { Button, Grid } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
 import { OrderDetails } from "@/components/OrderDetails";
+import Popup from "reactjs-popup";
 
 const Orders = () => {
+  const ref = useRef();
+  const [open, setOpen] = useState(false);
+  const closeTooltip = () => ref.current.close();
+  const closeModal = () => setOpen(false);
+
   const [orders, setOrders] = useState(null);
   const [order, setOrder] = useState("ddd");
   const [productDetails, setProductDetails] = useState(null);
@@ -52,7 +58,7 @@ const Orders = () => {
       <SideBarMenu />
       <div className="content-area">
         <div className="container-fluid">
-          {order && <OrderDetails order={order} orders={orders} />}
+          {/* {order && <OrderDetails order={order} orders={orders} />} */}
           <div className="product-area doc-details mt-3 order-details">
             <div className="row">
               <div className="col-12">
@@ -145,13 +151,28 @@ const Orders = () => {
                                   ? `${"Pending"}`
                                   : `${"Shipping "}`}
                               </span>
-                              <button>
-                                <i
-                                  onClick={() => singleOrder(item?.node?.name)}
-                                  className="fa fa-eye"
-                                  aria-hidden="true"
-                                ></i>
-                              </button>
+
+                              <Popup
+                                ref={ref}
+                                trigger={
+                                  <button>
+                                    <i
+                                      onClick={() =>
+                                        singleOrder(item?.node?.name)
+                                      }
+                                      className="fa fa-eye"
+                                      aria-hidden="true"
+                                    ></i>
+                                  </button>
+                                }
+                                modal
+                              >
+                                <OrderDetails
+                                  order={order}
+                                  orders={orders}
+                                  closeTooltip={closeTooltip}
+                                />
+                              </Popup>
                             </td>
                           </tr>
                         )
