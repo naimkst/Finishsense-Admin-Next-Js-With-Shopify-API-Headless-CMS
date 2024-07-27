@@ -16,7 +16,7 @@ export const OrderDetails = ({ order, orders, closeTooltip }: any) => {
       </a>
 
       <PerfectScrollbar>
-        <div className="product-wrap order-details">
+        <div className="product-wrap">
           <h2>Order {order?.name}</h2>
 
           <div className="order-details-top">

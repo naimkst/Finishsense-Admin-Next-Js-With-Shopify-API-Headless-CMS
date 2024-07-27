@@ -135,3 +135,8 @@ a.close {
   color: #fff;
   cursor: pointer;
 }
+.order-details {
+  min-height: 310px;
+  max-height: 85dvh;
+  height: 85dvh;
+}
