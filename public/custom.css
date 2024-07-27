@@ -42,3 +42,49 @@
   display: flex;
   flex-direction: column;
 }
+.orderSummary {
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  padding: 30px;
+  border-radius: 5px;
+}
+.orderDetailsSum {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: #f3f3f3;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.summaryBox {
+  display: flex;
+}
+.summaryBox h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0px;
+}
+.summaryContentDiv {
+  padding-left: 15px;
+}
+.summaryBox span {
+  font-size: 12px;
+  font-weight: 400;
+}
+.summaryBox p {
+  font-size: 12px;
+  font-weight: 400;
+  margin-bottom: 0px;
+}
+span.sumPrice {
+  font-size: 16px;
+  font-weight: 600;
+  color: black;
+}
+.priceBoxSum {
+  padding-top: 20px;
+}
+.grandTotal {
+  margin-bottom: 0px;
+}

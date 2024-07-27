@@ -58,8 +58,47 @@ export const OrderDetails = ({ order, orders }: any) => {
               </div>
 
               <div className="col-lg-4">
-                <div className="top-title">
-                  <h3>Order Detail</h3>
+                <div className="orderSummary">
+                  {order?.lineItems?.edges?.map((prd: any, index: number) => (
+                    <div key={`sum-${index}`} className="orderDetailsSum">
+                      <div className="summaryBox">
+                        <span>{index + 1}</span>
+                        <div className="summaryContentDiv">
+                          <h2>{prd?.node?.product?.title}</h2>
+                          <p>
+                            {prd?.node?.quantity}
+                            <span>
+                              X{" "}
+                              {prd?.node?.product?.priceRangeV2?.maxVariantPrice
+                                ?.currencyCode == "USD"
+                                ? "$"
+                                : prd?.node?.product?.priceRangeV2
+                                    ?.maxVariantPrice?.currencyCode}
+                              {
+                                prd?.node?.product?.priceRangeV2
+                                  ?.maxVariantPrice?.amount
+                              }
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      <span className="sumPrice">
+                        {prd?.node?.product?.priceRangeV2?.maxVariantPrice
+                          ?.currencyCode == "USD"
+                          ? "$"
+                          : prd?.node?.product?.priceRangeV2?.maxVariantPrice
+                              ?.currencyCode}
+                        {prd?.node?.quantity *
+                          prd?.node?.product?.priceRangeV2?.maxVariantPrice
+                            ?.amount}
+                      </span>
+                    </div>
+                  ))}
+
+                  <div className="priceBoxSum">
+                    <p className="SubTotal">Subtotal: </p>
+                    <p className="grandTotal">Grand Total: </p>
+                  </div>
                 </div>
               </div>
             </div>
