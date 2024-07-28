@@ -5,21 +5,15 @@ import "react-perfect-scrollbar/dist/css/styles.css";
 import SideBarMenu from "../../components/Sidebar";
 import Header from "../../components/Header";
 import moment from "moment";
-import { Button, Grid } from "@mui/material";
-import Link from "next/link";
 import Image from "next/image";
 import { OrderDetails } from "@/components/OrderDetails";
 import Popup from "reactjs-popup";
 
 const Orders = () => {
-  const ref = useRef();
   const [open, setOpen] = useState(false);
-  const closeTooltip = () => ref.current.close();
   const closeModal = () => setOpen(false);
-
   const [orders, setOrders] = useState(null);
-  const [order, setOrder] = useState("ddd");
-  const [productDetails, setProductDetails] = useState(null);
+  const [order, setOrder] = useState(null);
   const [statusCheck, setStatusCheck] = useState("null");
   useEffect(() => {
     const fetchProducts = async () => {
@@ -53,138 +47,138 @@ const Orders = () => {
   };
 
   return (
-    <div className="page-wrapper">
-      <Header />
-      <SideBarMenu />
-      <div className="content-area">
-        <div className="container-fluid">
-          {/* {order && <OrderDetails order={order} orders={orders} />} */}
-          <div className="product-area doc-details mt-3 order-details">
-            <div className="row">
-              <div className="col-12">
-                <div className="top-title">
-                  <h3>Order History</h3>
+    <>
+      <div className="page-wrapper">
+        <Header />
+        <SideBarMenu />
+        <div className="content-area">
+          <div className="container-fluid">
+            {/* {order && <OrderDetails order={order} orders={orders} />} */}
+            <div className="product-area doc-details mt-3 order-details">
+              <div className="row">
+                <div className="col-12">
+                  <div className="top-title">
+                    <h3>Order History</h3>
 
-                  <div className="open-order">
-                    <h4>Open Orders</h4>
-                    <div className="center">
-                      <input type="checkbox" onChange={(e) => orderStatus(e)} />
+                    <div className="open-order">
+                      <h4>Open Orders</h4>
+                      <div className="center">
+                        <input
+                          type="checkbox"
+                          onChange={(e) => orderStatus(e)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <PerfectScrollbar>
-              <div className="table-wrap">
-                <table className="table-responsive cart-wrap">
-                  <tbody>
-                    {orders?.map(
-                      (item, index) =>
-                        item?.fulfillment_status != statusCheck && (
-                          <tr key={`order-${index}`}>
-                            <td className="product">
-                              <div className="info">
-                                <div className="icon">
-                                  <Image
-                                    src={
-                                      item?.node?.lineItems?.edges[0]?.node
-                                        ?.image?.url
-                                    }
-                                    width={50}
-                                    height={50}
-                                    className="p-2"
-                                    alt=""
-                                  />
-                                  {/* <i className="icon-ico"></i> */}
-                                </div>
-                                <div className="text">
-                                  <h4>{item?.node?.name}</h4>
-                                  {/* <span>Sales</span> */}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="date">
-                              <b>
-                                {item?.node?.totalPriceSet?.presentmentMoney
-                                  ?.currencyCode == "USD"
-                                  ? "$"
-                                  : item?.node?.totalPriceSet?.presentmentMoney
-                                      ?.currencyCode}
-                                {
-                                  item?.node?.totalPriceSet?.presentmentMoney
-                                    ?.amount
-                                }
-                              </b>
-                              <span>Amount</span>
-                            </td>
-                            <td className="date">
-                              <b>
-                                {moment(item?.node?.updated_at).format(
-                                  "DD MMM YYY"
-                                )}
-                              </b>
-                              <span>Date</span>
-                            </td>
-                            <td className="date">
-                              <b>{item?.node?.lineItems?.edges?.length}</b>
-                              <span>Products</span>
-                            </td>
-                            <td className="date">
-                              <b>
-                                {`${item?.node?.billingAddress?.firstName} ${item?.node?.billingAddress?.lastName}`}{" "}
-                              </b>
-                              <span>User Name</span>
-                            </td>
-                            <td className="date">
-                              <b>{item?.node?.billingAddress?.phone}</b>
-                              <span>Phone Number</span>
-                            </td>
-                            <td className="action-btn">
-                              <span
-                                className={
-                                  item?.node?.fulfillable == true
-                                    ? "complete"
-                                    : ""
-                                }
-                              >
-                                {item?.node?.fulfillable == false
-                                  ? `${"Pending"}`
-                                  : `${"Shipping "}`}
-                              </span>
-
-                              <Popup
-                                ref={ref}
-                                trigger={
-                                  <button>
-                                    <i
-                                      onClick={() =>
-                                        singleOrder(item?.node?.name)
+              <PerfectScrollbar>
+                <div className="table-wrap">
+                  <table className="table-responsive cart-wrap">
+                    <tbody>
+                      {orders?.map(
+                        (item, index) =>
+                          item?.fulfillment_status != statusCheck && (
+                            <tr key={`order-${index}`}>
+                              <td className="product">
+                                <div className="info">
+                                  <div className="icon">
+                                    <Image
+                                      src={
+                                        item?.node?.lineItems?.edges[0]?.node
+                                          ?.image?.url
                                       }
-                                      className="fa fa-eye"
-                                      aria-hidden="true"
-                                    ></i>
-                                  </button>
-                                }
-                                modal
-                              >
-                                <OrderDetails
-                                  order={order}
-                                  orders={orders}
-                                  closeTooltip={closeTooltip}
-                                />
-                              </Popup>
-                            </td>
-                          </tr>
-                        )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </PerfectScrollbar>
+                                      width={50}
+                                      height={50}
+                                      className="p-2"
+                                      alt=""
+                                    />
+                                    {/* <i className="icon-ico"></i> */}
+                                  </div>
+                                  <div className="text">
+                                    <h4>{item?.node?.name}</h4>
+                                    {/* <span>Sales</span> */}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="date">
+                                <b>
+                                  {item?.node?.totalPriceSet?.presentmentMoney
+                                    ?.currencyCode == "USD"
+                                    ? "$"
+                                    : item?.node?.totalPriceSet
+                                        ?.presentmentMoney?.currencyCode}
+                                  {
+                                    item?.node?.totalPriceSet?.presentmentMoney
+                                      ?.amount
+                                  }
+                                </b>
+                                <span>Amount</span>
+                              </td>
+                              <td className="date">
+                                <b>
+                                  {moment(item?.node?.updated_at).format(
+                                    "DD MMM YYY"
+                                  )}
+                                </b>
+                                <span>Date</span>
+                              </td>
+                              <td className="date">
+                                <b>{item?.node?.lineItems?.edges?.length}</b>
+                                <span>Products</span>
+                              </td>
+                              <td className="date">
+                                <b>
+                                  {`${item?.node?.billingAddress?.firstName} ${item?.node?.billingAddress?.lastName}`}{" "}
+                                </b>
+                                <span>User Name</span>
+                              </td>
+                              <td className="date">
+                                <b>{item?.node?.billingAddress?.phone}</b>
+                                <span>Phone Number</span>
+                              </td>
+                              <td className="action-btn">
+                                <span
+                                  className={
+                                    item?.node?.fulfillable == true
+                                      ? "complete"
+                                      : ""
+                                  }
+                                >
+                                  {item?.node?.fulfillable == false
+                                    ? `${"Pending"}`
+                                    : `${"Shipping "}`}
+                                </span>
+
+                                <button>
+                                  <i
+                                    onClick={() => {
+                                      singleOrder(item?.node?.name);
+                                      setOpen((o) => !o);
+                                    }}
+                                    className="fa fa-eye"
+                                    aria-hidden="true"
+                                  ></i>
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </PerfectScrollbar>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {closeModal && (
+        <Popup open={open} closeOnDocumentClick onClose={closeModal} modal>
+          <OrderDetails order={order} orders={orders} closeModal={closeModal} />
+        </Popup>
+      )}
+    </>
   );
 };
 

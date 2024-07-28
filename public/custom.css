@@ -140,3 +140,6 @@ a.close {
   max-height: 85dvh;
   height: 85dvh;
 }
+.popup-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
