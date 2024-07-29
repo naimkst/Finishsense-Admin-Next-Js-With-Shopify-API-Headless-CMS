@@ -70,5 +70,5 @@ export function middleware(req: any, res: any) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/", "/product/:path*"], // Match all routes
+  matcher: ["/", "/product/:path*", "/order/:path*"], // Match all routes
 };
