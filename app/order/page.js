@@ -8,6 +8,7 @@ import moment from "moment";
 import Image from "next/image";
 import { OrderDetails } from "@/components/OrderDetails";
 import Popup from "reactjs-popup";
+import { Loader } from "@/components/Loader";
 
 const Orders = () => {
   const [open, setOpen] = useState(false);
@@ -42,9 +43,11 @@ const Orders = () => {
   };
 
   const orderStatus = (status) => {
-    setStatusCheck(status.target.checked ? "fulfilled" : "null");
+    setStatusCheck(status.target.checked ? true : null);
     console.log("status", status.target.checked);
   };
+
+  if (!orders) return <Loader />;
 
   return (
     <>
@@ -78,7 +81,7 @@ const Orders = () => {
                     <tbody>
                       {orders?.map(
                         (item, index) =>
-                          item?.fulfillment_status != statusCheck && (
+                          item?.node?.fulfillable != statusCheck && (
                             <tr key={`order-${index}`}>
                               <td className="product">
                                 <div className="info">
