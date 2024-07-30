@@ -8,6 +8,7 @@ import Image from "next/image";
 import { client } from "@/lib/shopifyBuy";
 import Link from "next/link";
 import { Loader } from "@/components/Loader";
+import { toFixed } from "@/lib/helpers";
 
 const Home = () => {
   const [products, setProducts] = useState(null);
@@ -66,8 +67,10 @@ const Home = () => {
                                   : item?.variants[0]?.compareAtPrice
                                       ?.currencyCode}
                                 {item?.variants[0]?.compareAtPrice?.amount
-                                  ? item?.variants[0]?.compareAtPrice?.amount
-                                  : item?.variants[0]?.price?.amount}
+                                  ? toFixed(
+                                      item?.variants[0]?.compareAtPrice?.amount
+                                    )
+                                  : toFixed(item?.variants[0]?.price?.amount)}
                               </li>
                               <li>
                                 Net Price:{" "}
@@ -76,7 +79,7 @@ const Home = () => {
                                   "USD"
                                     ? "$"
                                     : item?.variants[0]?.price?.currencyCode}
-                                  {item?.variants[0]?.price?.amount}
+                                  {toFixed(item?.variants[0]?.price?.amount)}
                                 </strong>
                               </li>
                             </ul>

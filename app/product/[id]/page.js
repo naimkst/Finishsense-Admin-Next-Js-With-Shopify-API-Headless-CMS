@@ -11,7 +11,7 @@ import Productinfo from "../Productinfo";
 import { client } from "@/lib/shopifyBuy";
 import { useParams } from "next/navigation";
 import { Loader } from "@/components/Loader";
-import { metafield } from "@/lib/helpers";
+import { metafield, toFixed } from "@/lib/helpers";
 import useFetch from "@/hooks/useFetch";
 import {
   useCart,
@@ -142,9 +142,13 @@ const productDetails = () => {
                               ?.maxVariantCompareAtPrice?.currencyCode}
                         {products?.compareAtPriceRange?.maxVariantCompareAtPrice
                           ?.amount
-                          ? products?.compareAtPriceRange
-                              ?.maxVariantCompareAtPrice?.amount
-                          : products?.priceRangeV2?.maxVariantPrice?.amount}
+                          ? toFixed(
+                              products?.compareAtPriceRange
+                                ?.maxVariantCompareAtPrice?.amount
+                            )
+                          : toFixed(
+                              products?.priceRangeV2?.maxVariantPrice?.amount
+                            )}
                       </li>
                       <li>
                         Net Price:{" "}
@@ -155,7 +159,9 @@ const productDetails = () => {
                             ? "$"
                             : products?.priceRangeV2?.maxVariantPrice
                                 ?.currencyCode}
-                          {products?.priceRangeV2?.maxVariantPrice?.amount}
+                          {toFixed(
+                            products?.priceRangeV2?.maxVariantPrice?.amount
+                          )}
                         </strong>
                       </li>
                     </ul>
