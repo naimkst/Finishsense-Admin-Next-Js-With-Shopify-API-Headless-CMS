@@ -35,13 +35,14 @@ export default async function handler(req, res) {
     const response = await fetch(storefrontEndpoint, {
       method: "POST",
       headers: {
-        "X-Shopify-Storefront-Access-Token": `${process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN}`,
         "Content-Type": "application/json",
+        "X-Shopify-Storefront-Access-Token": `${process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({ query, variables }),
     });
 
     const data = await response.json();
+    console.log("========", data);
 
     if (data.data.customerAccessTokenCreate.userErrors.length) {
       res
