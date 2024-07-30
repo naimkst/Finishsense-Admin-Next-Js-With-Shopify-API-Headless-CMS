@@ -111,6 +111,12 @@ span.sumPrice {
   margin-left: auto;
   margin-top: 20px;
 }
+.cart-btn {
+  cursor: pointer !important;
+}
+.cart-btn:hover {
+  background: black !important;
+}
 .orderInfos h3 {
   font-size: 20px !important;
 }

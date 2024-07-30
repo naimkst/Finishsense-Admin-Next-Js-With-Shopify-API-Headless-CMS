@@ -4,9 +4,13 @@ import Logo from "/public/images/logo.png";
 import profile from "/public/images/profile.png";
 import Image from "next/image";
 import OutsideClickHandler from "react-outside-click-handler";
+import { useCart, useCartBar, useCartCount } from "@/stores/product-store";
+import { toFixed } from "@/lib/helpers";
 
 const Header = () => {
-  const [open, setOpen] = useState(false);
+  const { cartShow, cartBarUpdate } = useCartBar();
+  const { cartCount } = useCartCount();
+  const { cart } = useCart();
 
   return (
     <>
@@ -38,7 +42,7 @@ const Header = () => {
                   <div className="right-info">
                     <ul>
                       <li>
-                        <a href="#" onClick={() => setOpen(true)}>
+                        <a href="#" onClick={() => cartBarUpdate(true)}>
                           <i className="icon-cart25"></i>
                         </a>
                       </li>
@@ -86,100 +90,71 @@ const Header = () => {
 
       <OutsideClickHandler
         onOutsideClick={() => {
-          setOpen(false);
+          cartBarUpdate(false);
         }}
       >
         <div
           className={`mini-cart-content ${
-            open ? " mini-cart-content-toggle" : ""
+            cartShow ? " mini-cart-content-toggle" : ""
           }`}
         >
           <div className="title"></div>
           <button
             className="mini-cart-close"
             onClick={() => {
-              setOpen(false);
+              cartBarUpdate(false);
             }}
           >
             <i className="ti-close"></i>
           </button>
           <div className="mini-cart-items">
-            <p className="top-p">Your Cart (1)</p>
+            <p className="top-p">Your Cart ({cartCount})</p>
 
-            <div className="mini-cart-item clearfix">
-              <div className="mini-cart-item-image">
-                <a href="shop.html">
-                  <img
-                    src="http://localhost:3000/_next/image?url=https%3A%2F%2Fcdn.shopify.com%2Fs%2Ffiles%2F1%2F0753%2F8393%2F1172%2Ffiles%2FKKA23.png%3Fv%3D1718275283&w=2048&q=75"
-                    width={100}
-                    height={100}
-                    alt=""
-                  />
-                </a>
-              </div>
-              <div className="mini-cart-item-des">
-                <h4>
-                  <a href="product-single.html">TX-VENICE</a>
-                </h4>
-                <ul className="product-text-sub">
-                  <li>Black</li>
-                </ul>
-                <a href="#" className="dlt-btn">
-                  <i className="ti-trash"></i>
-                </a>
-              </div>
-              <div className="pro-single-btn">
-                <span className="price">$200.00</span>
-                <div className="quantity cart-plus-minus">
-                  <input type="text" value="1" />
-                  <div className="dec qtybutton"></div>
-                  <div className="inc qtybutton"></div>
-                  <div className="dec qtybutton">-</div>
-                  <div className="inc qtybutton">+</div>
-                  <div className="dec qtybutton">-</div>
-                  <div className="inc qtybutton">+</div>
+            {cart?.lineItems?.map((item, index) => (
+              <div
+                key={`cartItem-${index}`}
+                className="mini-cart-item clearfix"
+              >
+                <div className="mini-cart-item-image">
+                  <a href="shop.html">
+                    <img
+                      src={item?.variant?.image.src}
+                      width={100}
+                      height={100}
+                      alt=""
+                    />
+                  </a>
+                </div>
+                <div className="mini-cart-item-des">
+                  <h4>
+                    <a href="product-single.html">{item?.title}</a>
+                  </h4>
+                  <ul className="product-text-sub">
+                    <li>SKU:{item?.variant?.sku}</li>
+                  </ul>
+                  <a href="#" className="dlt-btn">
+                    <i className="ti-trash"></i>
+                  </a>
+                </div>
+                <div className="pro-single-btn">
+                  <span className="price">
+                    {item?.variant?.price?.currencyCode == "USD"
+                      ? "$"
+                      : item?.variant?.price?.currencyCode}
+                    {toFixed(item?.variant?.price?.amount)}
+                  </span>
+                  <div className="quantity cart-plus-minus">
+                    <input type="text" value={item?.quantity} />
+                    <div className="dec qtybutton"></div>
+                    <div className="inc qtybutton"></div>
+                    <div className="dec qtybutton">-</div>
+                    <div className="inc qtybutton">+</div>
+                    <div className="dec qtybutton">-</div>
+                    <div className="inc qtybutton">+</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div
-              className="mini-cart-item clearfix"
-              data-bs-toggle="modal"
-              data-bs-target="#popup-quickview"
-            >
-              <div className="mini-cart-item-image">
-                <a href="shop.html">
-                  <img
-                    src="http://localhost:3000/_next/image?url=https%3A%2F%2Fcdn.shopify.com%2Fs%2Ffiles%2F1%2F0753%2F8393%2F1172%2Ffiles%2FKKA23.png%3Fv%3D1718275283&w=2048&q=75"
-                    width={100}
-                    height={100}
-                    alt=""
-                  />
-                </a>
-              </div>
-              <div className="mini-cart-item-des">
-                <h4>
-                  <a href="product-single.html">TX-VENICE</a>
-                </h4>
-                <ul className="product-text-sub">
-                  <li>Black</li>
-                </ul>
-                <a href="#" className="dlt-btn">
-                  <i className="ti-trash"></i>
-                </a>
-              </div>
-              <div className="pro-single-btn">
-                <span className="price">$200.00</span>
-                <div className="quantity cart-plus-minus">
-                  <input type="text" value="1" />
-                  <div className="dec qtybutton"></div>
-                  <div className="inc qtybutton"></div>
-                  <div className="dec qtybutton">-</div>
-                  <div className="inc qtybutton">+</div>
-                  <div className="dec qtybutton">-</div>
-                  <div className="inc qtybutton">+</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
           <div className="mini-cart-action clearfix">
             <ul>

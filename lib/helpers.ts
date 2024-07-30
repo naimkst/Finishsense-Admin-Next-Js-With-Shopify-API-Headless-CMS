@@ -19,3 +19,7 @@ export function showImage(item: any, loop?: any) {
     }
   }
 }
+
+export const toFixed = (num: any) => {
+  return Number(num).toFixed(2);
+};

@@ -13,7 +13,12 @@ import { useParams } from "next/navigation";
 import { Loader } from "@/components/Loader";
 import { metafield } from "@/lib/helpers";
 import useFetch from "@/hooks/useFetch";
-import { useProductInfo } from "@/stores/product-store";
+import {
+  useCart,
+  useCartBar,
+  useCartCount,
+  useProductInfo,
+} from "@/stores/product-store";
 
 const productDetails = () => {
   const [qty, setQty] = useState(1);
@@ -21,6 +26,10 @@ const productDetails = () => {
   const [getInfo, setProductInfo] = useState([]);
   const router = useParams();
   const { product, update } = useProductInfo();
+  const { cartUpdate } = useCart();
+  const { cartBarUpdate } = useCartBar();
+  const { cartCount, cartCountUpdate } = useCartCount();
+  const [loader, setLoader] = useState(false);
 
   const {
     loading,
@@ -62,32 +71,28 @@ const productDetails = () => {
     }
   }, [getProductInfo, router.id]);
 
-  if (products) {
-    // Create an empty checkout
+  const addToCart = async () => {
+    setLoader(true);
+    console.info("product", products);
+    console.info("product", products?.variants?.edges[0]?.node?.id);
     client.checkout.create().then((checkout) => {
-      // console.log("checkout ", checkout);
+      const checkoutId = checkout?.id;
       const lineItemsToAdd = [
         {
-          variantId: products?.variants?.edges[0].node.id,
-          quantity: 1,
+          variantId: products?.variants?.edges[0]?.node?.id,
+          quantity: qty,
         },
       ];
-
-      // Add an item to the checkout variants?.edges[0].node.id
       client.checkout
-        .addLineItems(checkout?.id, lineItemsToAdd)
+        .addLineItems(checkoutId, lineItemsToAdd)
         .then((checkout) => {
-          // Do something with the updated checkout
-          // console.log("=======", checkout?.lineItems);
-          // Array with one additional line item
+          cartUpdate(checkout);
+          cartBarUpdate(true);
+          cartCountUpdate(checkout?.lineItems?.length);
+          setLoader(false);
         });
-
-      client.checkout.fetch(checkout?.id).then((checkout) => {
-        // Do something with the checkout
-        // console.log("444444", checkout);
-      });
     });
-  }
+  };
 
   if (!products || loading) return <Loader />;
 
@@ -177,9 +182,9 @@ const productDetails = () => {
                         </Button>
                       </Grid>
                     </div>
-                    <Link href="/" className="cart-btn">
-                      Add To Cart
-                    </Link>
+                    <div className="cart-btn" onClick={() => addToCart()}>
+                      {loader ? "Loading..." : "Add To Cart"}
+                    </div>
                   </div>
                 </div>
               </div>
