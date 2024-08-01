@@ -1,16 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "/public/images/logo.png";
 import profile from "/public/images/profile.png";
 import Image from "next/image";
 import OutsideClickHandler from "react-outside-click-handler";
-import { useCart, useCartBar, useCartCount } from "@/stores/product-store";
+import {
+  useCart,
+  useCartBar,
+  useCartCount,
+  useLoader,
+} from "@/stores/product-store";
 import { toFixed } from "@/lib/helpers";
+import { client } from "@/lib/shopifyBuy";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const { cartShow, cartBarUpdate } = useCartBar();
-  const { cartCount } = useCartCount();
-  const { cart } = useCart();
+  const { cart, cartUpdate } = useCart();
+
+  const removeItem = (item) => {
+    if (!cart || cart.lineItems.length === 0) {
+      console.error("Cart is empty or does not exist.");
+      return;
+    }
+    const checkoutId = cart.id;
+
+    client.checkout
+      .removeLineItems(checkoutId, [item])
+      .then((checkout) => {
+        cartUpdate(checkout);
+        toast.success("Item removed from cart.");
+      })
+      .catch((error) => {
+        console.error("Error removing line item:", error);
+        toast.error("Oops! Something went wrong. Please try again.");
+      });
+  };
+
+  console.log("cart", cart);
 
   return (
     <>
@@ -44,6 +71,9 @@ const Header = () => {
                       <li>
                         <a href="#" onClick={() => cartBarUpdate(true)}>
                           <i className="icon-cart25"></i>
+                          <span>
+                            {cart?.lineItems ? cart?.lineItems.length : 0}
+                          </span>
                         </a>
                       </li>
                       <li>
@@ -108,7 +138,9 @@ const Header = () => {
             <i className="ti-close"></i>
           </button>
           <div className="mini-cart-items">
-            <p className="top-p">Your Cart ({cartCount})</p>
+            <p className="top-p">
+              Your Cart ({cart?.lineItems ? cart?.lineItems.length : 0})
+            </p>
 
             {cart?.lineItems?.map((item, index) => (
               <div
@@ -132,7 +164,11 @@ const Header = () => {
                   <ul className="product-text-sub">
                     <li>SKU:{item?.variant?.sku}</li>
                   </ul>
-                  <a href="#" className="dlt-btn">
+                  <a
+                    href="#"
+                    className="dlt-btn"
+                    onClick={() => removeItem(item?.id)}
+                  >
                     <i className="ti-trash"></i>
                   </a>
                 </div>
@@ -158,13 +194,20 @@ const Header = () => {
           </div>
           <div className="mini-cart-action clearfix">
             <ul>
-              <li>Subtotal(2 items)</li>
               <li>
-                <strong>$68,000</strong>
+                Subtotal ({cart?.lineItems ? cart?.lineItems.length : 0}) items{" "}
+              </li>
+              <li>
+                <strong>
+                  {cart?.subtotalPrice?.currencyCode == "USD"
+                    ? "$"
+                    : cart?.subtotalPrice?.currencyCode}
+                  {toFixed(cart?.subtotalPrice?.amount)}
+                </strong>
               </li>
             </ul>
             <div className="mini-btn">
-              <a href="checkout.html" className="view-cart-btn">
+              <a href={cart?.webUrl} className="view-cart-btn">
                 CONTINUE TO CHECKOUT
               </a>
             </div>

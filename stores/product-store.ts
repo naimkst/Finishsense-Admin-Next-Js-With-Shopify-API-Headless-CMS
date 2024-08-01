@@ -7,23 +7,15 @@ export const useProductInfo = create((set) => ({
   remove: () => set({ product: [] }),
 }));
 
+export const useLoader = create((set) => ({
+  loader: false,
+  setLoader: (loader: boolean) => set(() => ({ loader })),
+}));
+
 export const useCartBar = create((set) => ({
   cartShow: false,
   cartBarUpdate: (cartShow: boolean) => set(() => ({ cartShow })),
 }));
-
-export const useCartCount = create(
-  persist(
-    (set) => ({
-      cartCount: 0,
-      cartCountUpdate: (cartCount: any) => set(() => ({ cartCount })),
-    }),
-    {
-      name: "cartStorage",
-      getStorage: () => localStorage,
-    }
-  )
-);
 
 export const useCart = create(
   persist(

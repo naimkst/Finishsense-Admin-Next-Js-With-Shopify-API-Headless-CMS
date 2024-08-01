@@ -17,8 +17,10 @@ import {
   useCart,
   useCartBar,
   useCartCount,
+  useLoader,
   useProductInfo,
 } from "@/stores/product-store";
+import { toast } from "react-toastify";
 
 const productDetails = () => {
   const [qty, setQty] = useState(1);
@@ -28,8 +30,7 @@ const productDetails = () => {
   const { product, update } = useProductInfo();
   const { cart, cartUpdate } = useCart();
   const { cartBarUpdate } = useCartBar();
-  const { cartCountUpdate } = useCartCount();
-  const [loader, setLoader] = useState(false);
+  const { loader, setLoader } = useLoader();
 
   const {
     loading,
@@ -82,47 +83,56 @@ const productDetails = () => {
       },
     ];
 
-    if (cart?.lineItems?.length == 0) {
-      client.checkout
-        .create()
-        .then((checkout) => {
-          const checkoutId = checkout?.id;
-          client.checkout
-            .addLineItems(checkoutId, lineItemsToAdd)
-            .then((checkout) => {
-              cartUpdate(checkout);
-              cartBarUpdate(true);
-              cartCountUpdate(checkout?.lineItems?.length);
-              setLoader(false);
-            })
-            .catch((error) => {
-              console.log("Failed to add item in cart");
-              setLoader(false);
-            });
-        })
-        .catch((error) => {
-          console.log("Error creating checkout");
-          setLoader(false);
-        });
-    } else {
-      const checkoutId = cart.id;
-      client.checkout
-        .addLineItems(checkoutId, lineItemsToAdd)
-        .then((checkout) => {
-          cartUpdate(checkout);
-          cartBarUpdate(true);
-          cartCountUpdate(checkout?.lineItems?.length);
-          setLoader(false);
-        })
-        .catch((error) => {
-          console.error("Error adding line items:", error);
-          setLoader(false);
-        });
+    console.log("lineItemsToAdd", Object.keys(cart).length);
+
+    try {
+      if (Object.keys(cart).length == 0) {
+        client.checkout
+          .create()
+          .then((checkout) => {
+            const checkoutId = checkout?.id;
+            client.checkout
+              .addLineItems(checkoutId, lineItemsToAdd)
+              .then((checkout) => {
+                cartUpdate(checkout);
+                cartBarUpdate(true);
+                setLoader(false);
+                toast.success("Item added to cart.");
+              })
+              .catch((error) => {
+                console.log("Failed to add item in cart");
+                setLoader(false);
+                toast.error("Failed to add item in cart");
+              });
+          })
+          .catch((error) => {
+            console.log("Error creating checkout");
+            setLoader(false);
+            toast.error("Error creating checkout");
+          });
+      } else {
+        const checkoutId = cart.id;
+        client.checkout
+          .addLineItems(checkoutId, lineItemsToAdd)
+          .then((checkout) => {
+            cartUpdate(checkout);
+            cartBarUpdate(true);
+            setLoader(false);
+            toast.success("Item added to cart.");
+          })
+          .catch((error) => {
+            console.error("Error adding line items:", error);
+            setLoader(false);
+            toast.error("Failed to add item in cart");
+          });
+      }
+    } catch (error) {
+      console.log("Failed to add item in cart");
+      setLoader(false);
+      toast.error("Failed to add item in cart");
     }
   };
 
-  console.log("id", cart?.id);
-  console.log("====@@@@@@", cart);
   if (!products || loading) return <Loader />;
 
   return (
