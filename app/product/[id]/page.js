@@ -26,9 +26,9 @@ const productDetails = () => {
   const [getInfo, setProductInfo] = useState([]);
   const router = useParams();
   const { product, update } = useProductInfo();
-  const { cartUpdate } = useCart();
+  const { cart, cartUpdate } = useCart();
   const { cartBarUpdate } = useCartBar();
-  const { cartCount, cartCountUpdate } = useCartCount();
+  const { cartCountUpdate } = useCartCount();
   const [loader, setLoader] = useState(false);
 
   const {
@@ -75,14 +75,37 @@ const productDetails = () => {
     setLoader(true);
     console.info("product", products);
     console.info("product", products?.variants?.edges[0]?.node?.id);
-    client.checkout.create().then((checkout) => {
-      const checkoutId = checkout?.id;
-      const lineItemsToAdd = [
-        {
-          variantId: products?.variants?.edges[0]?.node?.id,
-          quantity: qty,
-        },
-      ];
+    const lineItemsToAdd = [
+      {
+        variantId: products?.variants?.edges[0]?.node?.id,
+        quantity: qty,
+      },
+    ];
+
+    if (cart?.lineItems?.length == 0) {
+      client.checkout
+        .create()
+        .then((checkout) => {
+          const checkoutId = checkout?.id;
+          client.checkout
+            .addLineItems(checkoutId, lineItemsToAdd)
+            .then((checkout) => {
+              cartUpdate(checkout);
+              cartBarUpdate(true);
+              cartCountUpdate(checkout?.lineItems?.length);
+              setLoader(false);
+            })
+            .catch((error) => {
+              console.log("Failed to add item in cart");
+              setLoader(false);
+            });
+        })
+        .catch((error) => {
+          console.log("Error creating checkout");
+          setLoader(false);
+        });
+    } else {
+      const checkoutId = cart.id;
       client.checkout
         .addLineItems(checkoutId, lineItemsToAdd)
         .then((checkout) => {
@@ -90,10 +113,16 @@ const productDetails = () => {
           cartBarUpdate(true);
           cartCountUpdate(checkout?.lineItems?.length);
           setLoader(false);
+        })
+        .catch((error) => {
+          console.error("Error adding line items:", error);
+          setLoader(false);
         });
-    });
+    }
   };
 
+  console.log("id", cart?.id);
+  console.log("====@@@@@@", cart);
   if (!products || loading) return <Loader />;
 
   return (
