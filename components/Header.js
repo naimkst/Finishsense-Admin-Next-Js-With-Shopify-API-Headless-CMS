@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "/public/images/logo.png";
 import profile from "/public/images/profile.png";
@@ -13,12 +13,19 @@ import {
 import { toFixed } from "@/lib/helpers";
 import { client } from "@/lib/shopifyBuy";
 import { toast } from "react-toastify";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const Header = () => {
   const { cartShow, cartBarUpdate } = useCartBar();
   const { cart, cartUpdate } = useCart();
+  const { loader, setLoader } = useLoader();
+  const [query, setQuery] = useState("");
+  const searchRouter = useSearchParams();
+  const searchQuery = searchRouter.get("query");
+  const router = useRouter();
 
   const removeItem = (item) => {
+    setLoader(true);
     if (!cart || cart.lineItems.length === 0) {
       console.error("Cart is empty or does not exist.");
       return;
@@ -30,14 +37,22 @@ const Header = () => {
       .then((checkout) => {
         cartUpdate(checkout);
         toast.success("Item removed from cart.");
+        setLoader(false);
       })
       .catch((error) => {
         console.error("Error removing line item:", error);
         toast.error("Oops! Something went wrong. Please try again.");
+        setLoader(false);
       });
   };
 
   const updateItem = (item, quantity) => {
+    setLoader(true);
+    if (!cart || cart.lineItems.length === 0) {
+      console.error("Cart is empty or does not exist.");
+      toast.error("Cart is empty or does not exist.");
+      return;
+    }
     const lineItemsToUpdate = [{ id: item, quantity: quantity }];
     client.checkout
       .updateLineItems(cart?.id, lineItemsToUpdate)
@@ -45,14 +60,23 @@ const Header = () => {
         cartUpdate(checkout);
         console.log(checkout.lineItems);
         toast.success("Item updated in cart.");
+        setLoader(false);
       })
       .catch((error) => {
         console.error("Error updating line item:", error);
         toast.error("Oops! Something went wrong. Please try again.");
+        setLoader(false);
       });
   };
 
-  console.log("cart", cart);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    router.push(`/search/?query=${query}`);
+  };
+
+  useEffect(() => {
+    setQuery(searchQuery);
+  }, [searchQuery]);
 
   return (
     <>
@@ -70,13 +94,15 @@ const Header = () => {
               <div className="col-lg-9 col-md-9 col-7">
                 <div className="header-right">
                   <div className="search">
-                    <form>
+                    <form onSubmit={handleSearch}>
                       <input
                         type="text"
                         placeholder="search..."
                         className="form-control input-sm r-10 input-bg-none"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
                       />
-                      <button className="search-btn">
+                      <button className="search-btn" type="submit">
                         <i className="fa fa-search"></i>
                       </button>
                     </form>
@@ -198,25 +224,39 @@ const Header = () => {
                     <input type="text" value={item?.quantity} />
                     <div className="dec qtybutton"></div>
                     <div className="inc qtybutton"></div>
-                    <div
-                      className="dec qtybutton"
-                      onClick={() => updateItem(item?.id, item?.quantity - 1)}
-                    >
-                      -
-                    </div>
+                    {loader ? (
+                      <div className="dec qtybutton">-</div>
+                    ) : (
+                      <div
+                        className="dec qtybutton"
+                        onClick={() => updateItem(item?.id, item?.quantity - 1)}
+                      >
+                        -
+                      </div>
+                    )}
+
                     <div className="inc qtybutton">+</div>
-                    <div
-                      className="dec qtybutton"
-                      onClick={() => updateItem(item?.id, item?.quantity - 1)}
-                    >
-                      -
-                    </div>
-                    <div
-                      className="inc qtybutton"
-                      onClick={() => updateItem(item?.id, item?.quantity + 1)}
-                    >
-                      +
-                    </div>
+                    {loader ? (
+                      <div className="dec qtybutton">-</div>
+                    ) : (
+                      <div
+                        className="dec qtybutton"
+                        onClick={() => updateItem(item?.id, item?.quantity - 1)}
+                      >
+                        -
+                      </div>
+                    )}
+
+                    {loader ? (
+                      <div className="inc qtybutton">+</div>
+                    ) : (
+                      <div
+                        className="inc qtybutton"
+                        onClick={() => updateItem(item?.id, item?.quantity + 1)}
+                      >
+                        +
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -237,9 +277,15 @@ const Header = () => {
               </li>
             </ul>
             <div className="mini-btn">
-              <a href={cart?.webUrl} className="view-cart-btn">
-                CONTINUE TO CHECKOUT
-              </a>
+              {loader ? (
+                <a href="#" className="view-cart-btn">
+                  Loading...
+                </a>
+              ) : (
+                <a href={cart?.webUrl} className="view-cart-btn">
+                  CONTINUE TO CHECKOUT
+                </a>
+              )}
             </div>
           </div>
         </div>
