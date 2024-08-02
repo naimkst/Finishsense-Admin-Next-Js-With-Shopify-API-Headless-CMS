@@ -37,6 +37,21 @@ const Header = () => {
       });
   };
 
+  const updateItem = (item, quantity) => {
+    const lineItemsToUpdate = [{ id: item, quantity: quantity }];
+    client.checkout
+      .updateLineItems(cart?.id, lineItemsToUpdate)
+      .then((checkout) => {
+        cartUpdate(checkout);
+        console.log(checkout.lineItems);
+        toast.success("Item updated in cart.");
+      })
+      .catch((error) => {
+        console.error("Error updating line item:", error);
+        toast.error("Oops! Something went wrong. Please try again.");
+      });
+  };
+
   console.log("cart", cart);
 
   return (
@@ -183,10 +198,25 @@ const Header = () => {
                     <input type="text" value={item?.quantity} />
                     <div className="dec qtybutton"></div>
                     <div className="inc qtybutton"></div>
-                    <div className="dec qtybutton">-</div>
+                    <div
+                      className="dec qtybutton"
+                      onClick={() => updateItem(item?.id, item?.quantity - 1)}
+                    >
+                      -
+                    </div>
                     <div className="inc qtybutton">+</div>
-                    <div className="dec qtybutton">-</div>
-                    <div className="inc qtybutton">+</div>
+                    <div
+                      className="dec qtybutton"
+                      onClick={() => updateItem(item?.id, item?.quantity - 1)}
+                    >
+                      -
+                    </div>
+                    <div
+                      className="inc qtybutton"
+                      onClick={() => updateItem(item?.id, item?.quantity + 1)}
+                    >
+                      +
+                    </div>
                   </div>
                 </div>
               </div>
