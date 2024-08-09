@@ -16,6 +16,8 @@ const Orders = () => {
   const [orders, setOrders] = useState(null);
   const [order, setOrder] = useState(null);
   const [statusCheck, setStatusCheck] = useState("null");
+  const [showDetails, setShowDetails] = useState(false);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -57,6 +59,13 @@ const Orders = () => {
         <div className="content-area">
           <div className="container-fluid">
             {/* {order && <OrderDetails order={order} orders={orders} />} */}
+            {showDetails && (
+              <OrderDetails
+                order={order}
+                orders={orders}
+                setShowDetails={setShowDetails}
+              />
+            )}
             <div className="product-area doc-details mt-3 order-details">
               <div className="row">
                 <div className="col-12">
@@ -158,6 +167,7 @@ const Orders = () => {
                                     onClick={() => {
                                       singleOrder(item?.node?.name);
                                       setOpen((o) => !o);
+                                      setShowDetails(true);
                                     }}
                                     className="fa fa-eye"
                                     aria-hidden="true"
@@ -176,11 +186,11 @@ const Orders = () => {
         </div>
       </div>
 
-      {closeModal && (
+      {/* {closeModal && (
         <Popup open={open} closeOnDocumentClick onClose={closeModal} modal>
           <OrderDetails order={order} orders={orders} closeModal={closeModal} />
         </Popup>
-      )}
+      )} */}
     </>
   );
 };

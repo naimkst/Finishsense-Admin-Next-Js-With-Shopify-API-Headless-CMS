@@ -1,7 +1,12 @@
 import React, { Fragment, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 
-export const OrderDetails = ({ order, orders, closeModal }: any) => {
+export const OrderDetails = ({
+  order,
+  orders,
+  closeModal,
+  setShowDetails,
+}: any) => {
   return (
     <div className="product-area">
       <div className="row">
@@ -11,7 +16,7 @@ export const OrderDetails = ({ order, orders, closeModal }: any) => {
           </div>
         </div>
       </div>
-      <a className="close" onClick={closeModal}>
+      <a className="close" onClick={() => setShowDetails(false)}>
         &times;
       </a>
 

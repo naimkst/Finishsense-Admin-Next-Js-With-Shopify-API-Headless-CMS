@@ -78,6 +78,8 @@ const Header = () => {
     setQuery(searchQuery);
   }, [searchQuery]);
 
+
+
   return (
     <>
       <header>
