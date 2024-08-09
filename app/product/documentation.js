@@ -64,6 +64,7 @@ const Documentation = ({ data, info }) => {
                                   file?.attributes?.ext === ".jpg" ||
                                   file?.attributes?.ext === ".jpeg" ||
                                   file?.attributes?.ext === ".svg" ||
+                                  file?.attributes?.ext === ".webp" ||
                                   file?.attributes?.ext === ".gif" ||
                                   file?.attributes?.ext === ".bmp" ||
                                   file?.attributes?.ext === ".tiff" ||

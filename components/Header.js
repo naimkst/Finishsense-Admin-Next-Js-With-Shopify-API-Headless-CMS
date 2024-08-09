@@ -14,6 +14,7 @@ import { toFixed } from "@/lib/helpers";
 import { client } from "@/lib/shopifyBuy";
 import { toast } from "react-toastify";
 import { useSearchParams, useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const Header = () => {
   const { cartShow, cartBarUpdate } = useCartBar();
@@ -78,7 +79,12 @@ const Header = () => {
     setQuery(searchQuery);
   }, [searchQuery]);
 
-
+  const signOut = () => {
+    Cookies.remove("shopifyCustomerAccessToken");
+    toast.success("Logged out successfully.");
+    // window.location.reload();
+    router.push("/login");
+  };
 
   return (
     <>
@@ -146,7 +152,9 @@ const Header = () => {
                           <a href="#">Account Profile</a>
                         </li>
                         <li>
-                          <a href="#">Sign Out</a>
+                          <a onClick={() => signOut()} href="#">
+                            Sign Out
+                          </a>
                         </li>
                         <li>
                           <a href="#">Contact Us</a>
