@@ -60,7 +60,7 @@ const LoginPage = (props) => {
         const data = await response.json();
 
         if (response.ok) {
-          const expires = new Date(new Date().getTime() + 500000 * 60 * 1000);
+          const expires = new Date(new Date().getTime() + 5 * 60 * 1000);
           Cookies.set("shopifyCustomerAccessToken", data.accessToken, {
             expires,
           });
