@@ -25,8 +25,6 @@ const Documentation = ({ data, info }) => {
 
   const infoData = info?.attributes?.product_info;
 
-  console.log("infoData", infoData?.InfoFiles);
-
   return (
     <div className="col-lg-6">
       <div className="card-design doc-details">
@@ -46,11 +44,7 @@ const Documentation = ({ data, info }) => {
         </Nav>
         <TabContent activeTab={activeTab}>
           {infoData?.InfoFiles?.map((item, index) => (
-            <TabPane
-              key={`info-${index}`}
-              tabId={index}
-              className={`${index + 1 == activeTab ? "active" : ""}`}
-            >
+            <TabPane key={`info-${index}`} tabId={index + 1} className="">
               <PerfectScrollbar>
                 <div className="table-wrap">
                   <table className="table-responsive cart-wrap">

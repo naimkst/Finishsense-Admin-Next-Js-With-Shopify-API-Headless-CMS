@@ -5,6 +5,15 @@ export default async function handler(req, res) {
 
   const { email, password } = req.body;
 
+  console.log(
+    "process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION",
+    process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION
+  );
+  console.log(
+    "process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN",
+    process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN
+  );
+
   try {
     // Your Shopify Storefront API endpoint
     const storefrontEndpoint = `https://${process.env.NEXT_PUBLIC_SHOPIFY_SHOP_NAME}/api/${process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION}/graphql.json`;

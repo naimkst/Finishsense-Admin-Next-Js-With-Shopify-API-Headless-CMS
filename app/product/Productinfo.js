@@ -15,7 +15,9 @@ import "react-perfect-scrollbar/dist/css/styles.css";
 import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 import { stringify } from "querystring";
 import rehypeRaw from "rehype-raw";
-import { metafield } from "@/lib/helpers";
+import { metafield, toFixed } from "@/lib/helpers";
+import Link from "next/link";
+import Image from "next/image";
 
 const Productinfo = ({ data, info }) => {
   const [activeTab, setActiveTab] = useState("1");
@@ -25,6 +27,8 @@ const Productinfo = ({ data, info }) => {
   };
 
   const infoData = info?.attributes?.product_info?.ProductTab;
+
+  console.log("infoData", infoData);
 
   return (
     <div className="col-lg-12">
@@ -68,9 +72,91 @@ const Productinfo = ({ data, info }) => {
             <TabPane key={`productTab-${index}`} tabId={index + 2}>
               <PerfectScrollbar>
                 <div className="details-wrap">
-                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                    {item?.TabText}
-                  </ReactMarkdown>
+                  {item?.TabText && (
+                    <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                      {item?.TabText}
+                    </ReactMarkdown>
+                  )}
+
+                  {item?.Products && (
+                    <div className="container-fluid">
+                      <div className="product-area">
+                        <PerfectScrollbar>
+                          <div className="product-wrap">
+                            <div className="product-items">
+                              {item?.Products.map((item, index) => (
+                                <div
+                                  key={`product-${index}`}
+                                  className="product-item-wrap"
+                                >
+                                  <Link href={`/product/${item.handle}`}>
+                                    <div className="product-item">
+                                      <div className="product-img">
+                                        <Image
+                                          src={item?.images[0]?.src}
+                                          width={item?.images[0]?.width}
+                                          height={item?.images[0]?.height}
+                                          alt={item?.title}
+                                        />
+                                      </div>
+                                      <div className="product-text">
+                                        <h3>{item?.title}</h3>
+                                        <ul>
+                                          {item?.variants[0]?.sku && (
+                                            <li>
+                                              Part Number:{" "}
+                                              {item?.variants[0]?.sku}
+                                            </li>
+                                          )}
+                                          {item?.vendor && (
+                                            <li>
+                                              Manufacturer: {item?.vendor}
+                                            </li>
+                                          )}
+                                          <li>
+                                            List Price:{" "}
+                                            {item?.variants[0]?.compareAtPrice
+                                              ?.currencyCode == "USD"
+                                              ? "$"
+                                              : item?.variants[0]
+                                                  ?.compareAtPrice
+                                                  ?.currencyCode}
+                                            {item?.variants[0]?.compareAtPrice
+                                              ?.amount
+                                              ? toFixed(
+                                                  item?.variants[0]
+                                                    ?.compareAtPrice?.amount
+                                                )
+                                              : toFixed(
+                                                  item?.variants[0]?.price
+                                                    ?.amount
+                                                )}
+                                          </li>
+                                          <li>
+                                            Net Price:{" "}
+                                            <strong>
+                                              {item?.variants[0]?.price
+                                                ?.currencyCode == "USD"
+                                                ? "$"
+                                                : item?.variants[0]?.price
+                                                    ?.currencyCode}
+                                              {toFixed(
+                                                item?.variants[0]?.price?.amount
+                                              )}
+                                            </strong>
+                                          </li>
+                                        </ul>
+                                      </div>
+                                    </div>
+                                  </Link>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </PerfectScrollbar>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </PerfectScrollbar>
             </TabPane>

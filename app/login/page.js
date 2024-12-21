@@ -64,8 +64,10 @@ const LoginPage = (props) => {
           Cookies.set("shopifyCustomerAccessToken", data.accessToken, {
             expires,
           });
-          toast.success("Successfully Login on Finishsence !");
+          toast.success("Successfully Login on Finishsence!");
+          // window.location.reload();
           router.push("/");
+          router.refresh();
         } else {
           //  setError(data.errors.map((error) => error.message).join(", "));
           toast.error("Invalid email or password!");
@@ -78,6 +80,13 @@ const LoginPage = (props) => {
       setLoading(false);
     }
   };
+
+  if (typeof window !== "undefined") {
+    const token = Cookies.get("shopifyCustomerAccessToken");
+    if (token) {
+      router.push("/");
+    }
+  }
 
   return (
     <div>

@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
 export function curentUrl(path: any) {
   if (path === "/login") {
