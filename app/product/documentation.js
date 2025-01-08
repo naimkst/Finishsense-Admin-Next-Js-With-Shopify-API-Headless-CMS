@@ -17,7 +17,7 @@ import moment from "moment";
 import Link from "next/link";
 
 const Documentation = ({ data, info }) => {
-  const [activeTab, setActiveTab] = useState("1");
+  const [activeTab, setActiveTab] = useState(1);
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
