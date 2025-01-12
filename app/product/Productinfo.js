@@ -80,7 +80,7 @@ const Productinfo = ({ data, info }) => {
 
                   {item?.Products && (
                     <div className="container-fluid">
-                      <div className="product-area">
+                      <div className="product-area info-product-area">
                         <PerfectScrollbar>
                           <div className="product-wrap">
                             <div className="product-items">
@@ -113,38 +113,6 @@ const Productinfo = ({ data, info }) => {
                                               Manufacturer: {item?.vendor}
                                             </li>
                                           )}
-                                          <li>
-                                            List Price:{" "}
-                                            {item?.variants[0]?.compareAtPrice
-                                              ?.currencyCode == "USD"
-                                              ? "$"
-                                              : item?.variants[0]
-                                                  ?.compareAtPrice
-                                                  ?.currencyCode}
-                                            {item?.variants[0]?.compareAtPrice
-                                              ?.amount
-                                              ? toFixed(
-                                                  item?.variants[0]
-                                                    ?.compareAtPrice?.amount
-                                                )
-                                              : toFixed(
-                                                  item?.variants[0]?.price
-                                                    ?.amount
-                                                )}
-                                          </li>
-                                          <li>
-                                            Net Price:{" "}
-                                            <strong>
-                                              {item?.variants[0]?.price
-                                                ?.currencyCode == "USD"
-                                                ? "$"
-                                                : item?.variants[0]?.price
-                                                    ?.currencyCode}
-                                              {toFixed(
-                                                item?.variants[0]?.price?.amount
-                                              )}
-                                            </strong>
-                                          </li>
                                         </ul>
                                       </div>
                                     </div>

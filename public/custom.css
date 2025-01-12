@@ -485,3 +485,8 @@ a.close {
   object-fit: cover;
   border-radius: 3px;
 }
+.product-area.info-product-area {
+  border: none;
+  padding: 0;
+  height: 100dvh;
+}
