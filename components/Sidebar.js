@@ -31,17 +31,12 @@ const menus = [
   {
     id: 3,
     title: "Recommend Spares",
-    link: "/",
+    link: "/recommend",
     submenu: [
       {
         id: 31,
         title: "Recommend Spares",
-        link: "/",
-      },
-      {
-        id: 34,
-        title: "Recommend Spares",
-        link: "/",
+        link: "/recommend",
       },
     ],
   },

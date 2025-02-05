@@ -59,9 +59,15 @@ const LoginPage = (props) => {
 
         const data = await response.json();
 
+        console.log(data);
         if (response.ok) {
-          const expires = new Date(new Date().getTime() + 5 * 60 * 1000);
+          const expires = data?.expiresAt
+            ? new Date(data?.expiresAt)
+            : new Date(new Date().getTime() + 5 * 60 * 1000);
           Cookies.set("shopifyCustomerAccessToken", data.accessToken, {
+            expires,
+          });
+          Cookies.set("userEmail", email, {
             expires,
           });
           toast.success("Successfully Login on Finishsence!");

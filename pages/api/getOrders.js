@@ -1,9 +1,12 @@
 import { shopify } from "@/lib/shopify";
+import { parse } from "cookie";
 
 export default async function hello(req, res) {
+  const cookies = parse(req.headers.cookie || "");
+  const email = cookies.userEmail; // Get user email from cookies
   const operation = `
     query OrdersQuery {
-      orders(first: 100) {
+      orders(first: 100, query:"email:${email}") {
         edges {
           node {
             id
@@ -85,6 +88,7 @@ export default async function hello(req, res) {
                 node {
                   sku
                   product {
+                    id
                     title
                     hasOutOfStockVariants
                     featuredImage {
