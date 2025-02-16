@@ -1,60 +1,52 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import SideBarMenu from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Image from "next/image";
-import { client } from "@/lib/shopifyBuy";
 import Link from "next/link";
 import { Loader } from "@/components/Loader";
 import { toFixed } from "@/lib/helpers";
+import { useCookies } from "react-cookie";
 
 const Home = () => {
-  const [products, setProducts] = useState(null);
-  const [orders, setOrders] = useState(null);
+  const [collection, setCollection] = useState(null);
+  const [recommenProduct, setRecommendProduct] = useState([]);
+  const [cookies] = useCookies(["userEmail"]);
 
-  useState(() => {
-    // const getOrders = async () => {
-    //   try {
-    //     await fetch("/api/getOrders")
-    //       .then((response) =>
-    //         response.json().then((data) => {
-    //           console.log(data?.data?.edges);
-    //           setOrders(data?.data?.edges);
-    //         })
-    //       )
-    //       .catch((error) => {
-    //         console.error("Failed to fetch product metafields:", error);
-    //       });
-    //   } catch (error) {
-    //     console.log("Opps! Something went wrong");
-    //   }
-    // };
-    // getOrders();
+  async function fetchCollections() {
+    const response = await fetch("/api/getCollectionId", {
+      method: "POST",
+    });
+    const data = await response.json();
+    setCollection(data?.collections?.edges);
+  }
 
-    async function fetchProductRecommendations() {
-      try {
-        const response = await fetch("/api/recommendations", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  useEffect(() => {
+    if (!collection) return; // Prevent running if collection is not set
 
-        const data = await response.json();
-        console.log("Recommended Products:", data.recommendations);
-        setProducts(data.recommendations);
-      } catch (error) {
-        console.error("Error fetching recommendations:", error);
-      }
-    }
+    const userEmail = cookies.userEmail || ""; // Get userEmail from cookies
+    console.log("User Email from Cookie:", userEmail);
 
-    // Fetch recommendations when needed
-    fetchProductRecommendations();
+    const result =
+      collection.find((item) => {
+        const metaValue = item?.node?.metafield?.value?.trim().toLowerCase();
+        const email = userEmail?.trim().toLowerCase();
+        return metaValue === email;
+      }) || null;
+
+    console.log("Result:", result);
+
+    setRecommendProduct(result?.node?.products?.edges || []);
+    console.log("Recommended Products:", result?.node?.products?.edges);
+  }, [collection, cookies]); // Re-run when collection or cookies change
+
+  useEffect(() => {
+    fetchCollections();
   }, []);
 
-  if (!products) return <Loader />;
+  if (!collection) return <Loader />;
 
   return (
     <div className="page-wrapper">
@@ -73,39 +65,39 @@ const Home = () => {
             <PerfectScrollbar>
               <div className="product-wrap">
                 <div className="product-items">
-                  {products.map((item, index) => (
+                  {recommenProduct?.map((item, index) => (
                     <div key={`product-${index}`} className="product-item-wrap">
-                      <Link href={`/product/${item.handle}`}>
+                      <Link href={`/product/${item?.node?.handle}`}>
                         <div className="product-item">
                           <div className="product-img">
                             <Image
-                              src={item?.featuredImage?.url}
-                              width={item?.featuredImage?.width}
-                              height={item?.featuredImage?.height}
-                              alt={item?.title}
+                              src={item?.node?.featuredImage?.url}
+                              width={item?.node?.featuredImage?.width}
+                              height={item?.node?.featuredImage?.height}
+                              alt={item?.node?.title}
                             />
                           </div>
                           <div className="product-text">
-                            <h3>{item?.title}</h3>
+                            <h3>{item?.node?.title}</h3>
                             <ul>
-                              {item?.variants?.edges[0]?.node?.sku && (
+                              {item?.node?.variants?.edges[0]?.node?.sku && (
                                 <li>
                                   Part Number:{" "}
-                                  {item?.variants?.edges[0]?.node?.sku}
+                                  {item?.node?.variants?.edges[0]?.node?.sku}
                                 </li>
                               )}
-                              {item?.vendor && (
-                                <li>Manufacturer: {item?.vendor}</li>
+                              {item?.node?.vendor && (
+                                <li>Manufacturer: {item?.node?.vendor}</li>
                               )}
-                              <li>
+                              {/* <li>
                                 List Price:{" "}
-                                {item?.variants?.edges[0]?.node?.compareAtPrice
-                                  ?.currencyCode == "USD"
+                                {item?.node?.variants?.edges[0]?.node
+                                  ?.compareAtPrice?.currencyCode == "USD"
                                   ? "$"
                                   : item?.variants?.edges[0]?.node
                                       ?.compareAtPrice?.currencyCode}
-                                {item?.variants?.edges[0]?.node?.compareAtPrice
-                                  ?.amount
+                                {item?.node?.variants?.edges[0]?.node
+                                  ?.compareAtPrice?.amount
                                   ? toFixed(
                                       item?.variants?.edges[0]?.node
                                         ?.compareAtPrice?.amount
@@ -114,17 +106,17 @@ const Home = () => {
                                       item?.variants?.edges[0]?.node?.price
                                         ?.amount
                                     )}
-                              </li>
+                              </li> */}
                               <li>
                                 Net Price:{" "}
                                 <strong>
-                                  {item?.variants?.edges[0]?.node?.price
+                                  {item?.node?.priceRange?.minVariantPrice
                                     ?.currencyCode == "USD"
                                     ? "$"
-                                    : item?.variants?.edges[0]?.node?.price
+                                    : item?.node?.priceRange?.minVariantPrice
                                         ?.currencyCode}
                                   {toFixed(
-                                    item?.variants?.edges[0]?.node?.price
+                                    item?.node?.priceRange?.maxVariantPrice
                                       ?.amount
                                   )}
                                 </strong>
