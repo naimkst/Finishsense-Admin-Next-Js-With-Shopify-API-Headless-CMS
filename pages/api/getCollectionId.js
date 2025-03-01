@@ -75,7 +75,7 @@ export default async function handler(req, res) {
                   }
                 }
               }
-              metafield(namespace: "custom", key: "email") {
+              metafield(namespace: "custom", key: "customer") {
                 value
               }
             }

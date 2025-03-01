@@ -490,3 +490,7 @@ a.close {
   padding: 0;
   height: 100dvh;
 }
+.no-product-found {
+  width: 100%;
+  text-align: center;
+}

@@ -21,26 +21,62 @@ const Home = () => {
     });
     const data = await response.json();
     setCollection(data?.collections?.edges);
+    console.log("#########", data?.collections?.edges);
+  }
+
+  async function fetchCustomer(id) {
+    console.log("Customer ID:", id);
+    const customerId = String(id); // Replace with a valid customer ID
+
+    const response = await fetch("/api/getUserById", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customerId: customerId,
+      }),
+    });
+
+    const data = await response.json();
+    console.log("Customer Data:=====", data?.customer?.email);
+    return data?.customer?.email;
   }
 
   useEffect(() => {
     if (!collection) return; // Prevent running if collection is not set
 
-    const userEmail = cookies.userEmail || ""; // Get userEmail from cookies
-    console.log("User Email from Cookie:", userEmail);
+    const fetchData = async () => {
+      try {
+        const userEmail = cookies.userEmail?.trim().toLowerCase() || ""; // Get userEmail from cookies
 
-    const result =
-      collection.find((item) => {
-        const metaValue = item?.node?.metafield?.value?.trim().toLowerCase();
-        const email = userEmail?.trim().toLowerCase();
-        return metaValue === email;
-      }) || null;
+        const result = await Promise.all(
+          collection.map(async (item) => {
+            console.log("Metafield Value:!!!!!!", item?.node?.metafield?.value);
 
-    console.log("Result:", result);
+            const metaValue = item?.node?.metafield?.value
+              ? (await fetchCustomer(item.node.metafield.value))
+                  ?.trim()
+                  .toLowerCase()
+              : "";
 
-    setRecommendProduct(result?.node?.products?.edges || []);
-    console.log("Recommended Products:", result?.node?.products?.edges);
-  }, [collection, cookies]); // Re-run when collection or cookies change
+            return metaValue === userEmail ? item : null;
+          })
+        );
+
+        const matchedItem = result.find((item) => item !== null) || null;
+        console.log("Result:", matchedItem);
+
+        setRecommendProduct(matchedItem?.node?.products?.edges || []);
+        console.log(
+          "Recommended Products:",
+          matchedItem?.node?.products?.edges
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [collection, cookies]); // ✅ Runs when `collection` or `cookies` change
 
   useEffect(() => {
     fetchCollections();
@@ -65,31 +101,39 @@ const Home = () => {
             <PerfectScrollbar>
               <div className="product-wrap">
                 <div className="product-items">
-                  {recommenProduct?.map((item, index) => (
-                    <div key={`product-${index}`} className="product-item-wrap">
-                      <Link href={`/product/${item?.node?.handle}`}>
-                        <div className="product-item">
-                          <div className="product-img">
-                            <Image
-                              src={item?.node?.featuredImage?.url}
-                              width={item?.node?.featuredImage?.width}
-                              height={item?.node?.featuredImage?.height}
-                              alt={item?.node?.title}
-                            />
-                          </div>
-                          <div className="product-text">
-                            <h3>{item?.node?.title}</h3>
-                            <ul>
-                              {item?.node?.variants?.edges[0]?.node?.sku && (
-                                <li>
-                                  Part Number:{" "}
-                                  {item?.node?.variants?.edges[0]?.node?.sku}
-                                </li>
-                              )}
-                              {item?.node?.vendor && (
-                                <li>Manufacturer: {item?.node?.vendor}</li>
-                              )}
-                              {/* <li>
+                  {recommenProduct.length === 0 ? (
+                    <div className="no-product-found">
+                      <h3 className="text-center">No Products Found!</h3>
+                    </div>
+                  ) : (
+                    recommenProduct?.map((item, index) => (
+                      <div
+                        key={`product-${index}`}
+                        className="product-item-wrap"
+                      >
+                        <Link href={`/product/${item?.node?.handle}`}>
+                          <div className="product-item">
+                            <div className="product-img">
+                              <Image
+                                src={item?.node?.featuredImage?.url}
+                                width={item?.node?.featuredImage?.width}
+                                height={item?.node?.featuredImage?.height}
+                                alt={item?.node?.title}
+                              />
+                            </div>
+                            <div className="product-text">
+                              <h3>{item?.node?.title}</h3>
+                              <ul>
+                                {item?.node?.variants?.edges[0]?.node?.sku && (
+                                  <li>
+                                    Part Number:{" "}
+                                    {item?.node?.variants?.edges[0]?.node?.sku}
+                                  </li>
+                                )}
+                                {item?.node?.vendor && (
+                                  <li>Manufacturer: {item?.node?.vendor}</li>
+                                )}
+                                {/* <li>
                                 List Price:{" "}
                                 {item?.node?.variants?.edges[0]?.node
                                   ?.compareAtPrice?.currencyCode == "USD"
@@ -107,26 +151,27 @@ const Home = () => {
                                         ?.amount
                                     )}
                               </li> */}
-                              <li>
-                                Net Price:{" "}
-                                <strong>
-                                  {item?.node?.priceRange?.minVariantPrice
-                                    ?.currencyCode == "USD"
-                                    ? "$"
-                                    : item?.node?.priceRange?.minVariantPrice
-                                        ?.currencyCode}
-                                  {toFixed(
-                                    item?.node?.priceRange?.maxVariantPrice
-                                      ?.amount
-                                  )}
-                                </strong>
-                              </li>
-                            </ul>
+                                <li>
+                                  Net Price:{" "}
+                                  <strong>
+                                    {item?.node?.priceRange?.minVariantPrice
+                                      ?.currencyCode == "USD"
+                                      ? "$"
+                                      : item?.node?.priceRange?.minVariantPrice
+                                          ?.currencyCode}
+                                    {toFixed(
+                                      item?.node?.priceRange?.maxVariantPrice
+                                        ?.amount
+                                    )}
+                                  </strong>
+                                </li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    </div>
-                  ))}
+                        </Link>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </PerfectScrollbar>
