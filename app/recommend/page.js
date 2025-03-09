@@ -24,23 +24,50 @@ const Home = () => {
     console.log("#########", data?.collections?.edges);
   }
 
-  async function fetchCustomer(id) {
-    console.log("Customer ID:", id);
-    const customerId = String(id); // Replace with a valid customer ID
+  async function fetchCustomer(id, userEmail) {
+    try {
+      const customerArray = JSON.parse(id); // ✅ Convert string to array safely
 
-    const response = await fetch("/api/getUserById", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customerId: customerId,
-      }),
-    });
+      // ✅ Use `Promise.all()` to handle multiple async requests
+      const matchedEmails = await Promise.all(
+        customerArray.map(async (gid) => {
+          console.log("Checking Customer ID:", gid);
 
-    const data = await response.json();
-    console.log("Customer Data:=====", data?.customer?.email);
-    return data?.customer?.email;
+          const response = await fetch("/api/getUserById", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ customerId: gid }), // ✅ Send each ID properly
+          });
+
+          if (!response.ok) {
+            console.error("Failed to fetch user:", response.status);
+            return null;
+          }
+
+          const data = await response.json();
+          const fetchedEmail =
+            data?.customer?.email?.trim().toLowerCase() || "";
+
+          if (fetchedEmail === userEmail) {
+            console.log("✅ Email Matched:", fetchedEmail);
+            return fetchedEmail; // ✅ Return first matched email
+          }
+
+          return null; // If no match, return null
+        })
+      );
+
+      // ✅ Find the first non-null matched email
+      const firstMatchedEmail =
+        matchedEmails.find((email) => email !== null) || null;
+
+      console.log("First Matched Email:", firstMatchedEmail);
+      return firstMatchedEmail; // ✅ Return a single string value, not an array
+    } catch (error) {
+      console.error("❌ Error fetching customers:", error);
+      return null; // ✅ Return null if an error occurs
+    }
   }
-
   useEffect(() => {
     if (!collection) return; // Prevent running if collection is not set
 
@@ -53,7 +80,7 @@ const Home = () => {
             console.log("Metafield Value:!!!!!!", item?.node?.metafield?.value);
 
             const metaValue = item?.node?.metafield?.value
-              ? (await fetchCustomer(item.node.metafield.value))
+              ? (await fetchCustomer(item.node.metafield.value, userEmail))
                   ?.trim()
                   .toLowerCase()
               : "";
