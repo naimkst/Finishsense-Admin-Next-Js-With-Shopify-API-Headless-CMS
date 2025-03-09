@@ -7,6 +7,12 @@ export const useProductInfo = create((set) => ({
   remove: () => set({ product: [] }),
 }));
 
+export const useCollections = create((set) => ({
+  collections: [],
+  setCollections: (collections: any) => set(() => ({ collections })),
+  remove: () => set({ collections: [] }),
+}));
+
 export const useLoader = create((set) => ({
   loader: false,
   setLoader: (loader: boolean) => set(() => ({ loader })),

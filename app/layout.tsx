@@ -8,8 +8,8 @@ import "../styles/themify-icons.css";
 import "../styles/icomoon.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../public/custom.css";
 import "reactjs-popup/dist/index.css";
+import "../public/custom.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",

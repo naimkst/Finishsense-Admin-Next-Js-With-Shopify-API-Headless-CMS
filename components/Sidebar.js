@@ -3,6 +3,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/List";
 import Collapse from "@mui/material/Collapse";
 import Link from "next/link";
+import { useCollections } from "@/stores/product-store";
 
 const menus = [
   {
@@ -61,6 +62,9 @@ const menus = [
 
 const SideBarMenu = () => {
   const [isToggled, setIsToggled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { collections } = useCollections();
 
   const toggleClass = () => {
     setIsToggled(!isToggled);
@@ -147,7 +151,26 @@ const SideBarMenu = () => {
           </div>
 
           <div className="product-menu">
-            <a href="#">All Products</a>
+            <Link
+              href="/"
+              className={`${isOpen ? "active" : null}`}
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              All Products
+            </Link>
+            {isOpen && (
+              <ul className="submenu">
+                {collections.map((item, i) => {
+                  return (
+                    <li key={i}>
+                      <Link href={`?collection=${item?.node.handle}`}>
+                        {item?.node?.title}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
           <div className="main-menu">
             {menus.map((item, mn) => {

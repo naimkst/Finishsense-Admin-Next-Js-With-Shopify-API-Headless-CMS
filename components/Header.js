@@ -9,6 +9,7 @@ import {
   useCartBar,
   useCartCount,
   useLoader,
+  useCollections,
 } from "@/stores/product-store";
 import { toFixed } from "@/lib/helpers";
 import { client } from "@/lib/shopifyBuy";
@@ -20,6 +21,7 @@ const Header = () => {
   const { cartShow, cartBarUpdate } = useCartBar();
   const { cart, cartUpdate } = useCart();
   const { loader, setLoader } = useLoader();
+  const { setCollections, collections } = useCollections();
   const [query, setQuery] = useState("");
   const searchRouter = useSearchParams();
   const searchQuery = searchRouter.get("query");
@@ -86,6 +88,19 @@ const Header = () => {
     router.push("/login");
   };
 
+  async function fetchCollections() {
+    const response = await fetch("/api/getCollectionId", {
+      method: "POST",
+    });
+    const data = await response.json();
+    setCollections(data?.collections?.edges);
+  }
+
+  useEffect(() => {
+    fetchCollections();
+  }, [router.id]);
+
+  console.log("collections", collections);
   return (
     <>
       <header>

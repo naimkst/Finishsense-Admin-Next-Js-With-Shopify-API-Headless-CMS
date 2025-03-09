@@ -494,3 +494,34 @@ a.close {
   width: 100%;
   text-align: center;
 }
+/* For the sidebar all proudct submenu */
+
+ul.submenu {
+  background: #323232;
+  padding: 10px 0px;
+  list-style: none;
+  border-radius: 0px 0px 2px 2px;
+}
+ul.submenu li {
+  padding-left: 10px !important;
+}
+ul.submenu li a::before {
+  top: 20px !important;
+}
+ul.submenu li a {
+  line-height: 23px;
+}
+.sidebar .sidebar-scrool .product-menu a {
+  border-radius: 2px 2px 0px 0px;
+}
+ul.submenu a:hover:before {
+  opacity: 0 !important;
+  visibility: visible;
+}
+ul.submenu li:hover a {
+  color: #3693d9 !important;
+}
+.product-menu a.active::before {
+  content: "\f0d7" !important;
+  position: absolute;
+}
