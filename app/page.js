@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import SideBarMenu from "../components/Sidebar";
@@ -9,14 +9,21 @@ import { client } from "@/lib/shopifyBuy";
 import Link from "next/link";
 import { Loader } from "@/components/Loader";
 import { toFixed } from "@/lib/helpers";
+import { useProducts } from "@/stores/product-store";
+import { usePathname } from "next/navigation";
 
 const Home = () => {
-  const [products, setProducts] = useState(null);
+  const { setProducts, products } = useProducts();
+  const pathname = usePathname();
 
-  useState(() => {
-    client.product.fetchAll().then((products) => {
+  const getProduct = async () => {
+    await client.product.fetchAll().then((products) => {
       setProducts(products);
     });
+  };
+
+  useEffect(() => {
+    getProduct();
   }, []);
 
   if (!products) return <Loader />;
@@ -38,6 +45,11 @@ const Home = () => {
             <PerfectScrollbar>
               <div className="product-wrap">
                 <div className="product-items">
+                  {products.length === 0 && (
+                    <div className="no-product-found">
+                      <h3 className="text-center">No products found!</h3>
+                    </div>
+                  )}
                   {products.map((item, index) => (
                     <div key={`product-${index}`} className="product-item-wrap">
                       <Link href={`/product/${item.handle}`}>

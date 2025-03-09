@@ -3,43 +3,38 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/List";
 import Collapse from "@mui/material/Collapse";
 import Link from "next/link";
-import { useCollections } from "@/stores/product-store";
+import { useCollections, useProducts } from "@/stores/product-store";
+import { client } from "@/lib/shopifyBuy";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const menus = [
-  {
-    id: 1,
-    title: "Maintainable Assets",
-    link: "/maintain",
-    submenu: [
-      {
-        id: 11,
-        title: "Maintainable Assets",
-        link: "/maintain",
-      },
-      {
-        id: 12,
-        title: "Maintainable Assets",
-        link: "/maintain",
-      },
-      {
-        id: 13,
-        title: "Maintainable Assets",
-        link: "/maintain",
-      },
-    ],
-  },
+  // {
+  //   id: 1,
+  //   title: "Maintainable Assets",
+  //   link: "/maintain",
+  //   submenu: [
+  //     {
+  //       id: 11,
+  //       title: "Maintainable Assets",
+  //       link: "/maintain",
+  //     },
+  //     {
+  //       id: 12,
+  //       title: "Maintainable Assets",
+  //       link: "/maintain",
+  //     },
+  //     {
+  //       id: 13,
+  //       title: "Maintainable Assets",
+  //       link: "/maintain",
+  //     },
+  //   ],
+  // },
 
   {
     id: 3,
-    title: "Recommend Spares",
+    title: "Recommended Spares",
     link: "/recommend",
-    submenu: [
-      {
-        id: 31,
-        title: "Recommend Spares",
-        link: "/recommend",
-      },
-    ],
   },
   {
     id: 4,
@@ -61,10 +56,12 @@ const menus = [
 ];
 
 const SideBarMenu = () => {
-  const [isToggled, setIsToggled] = useState(false);
+  const [isToggled, setIsToggled] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-
   const { collections } = useCollections();
+  const { setProducts, products } = useProducts();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const toggleClass = () => {
     setIsToggled(!isToggled);
@@ -88,6 +85,23 @@ const SideBarMenu = () => {
 
   const ClickHandler = () => {
     window.scrollTo(10, 0);
+  };
+
+  const getProductByCollection = async (collectionId) => {
+    if (collectionId === "") {
+      client.product.fetchAll().then((products) => {
+        setProducts(products);
+      });
+      return;
+    }
+    client.collection
+      .fetchWithProducts(collectionId, { productsFirst: 10 })
+      .then((collection) => {
+        // Do something with the collection
+        console.log(collection);
+        console.log(collection.products);
+        setProducts(collection.products);
+      });
   };
 
   return (
@@ -160,9 +174,15 @@ const SideBarMenu = () => {
             </Link>
             {isOpen && (
               <ul className="submenu">
+                <li onClick={() => getProductByCollection("")}>
+                  <Link href={`/`}>All Products</Link>
+                </li>
                 {collections.map((item, i) => {
                   return (
-                    <li key={i}>
+                    <li
+                      key={i}
+                      onClick={() => getProductByCollection(item?.node.id)}
+                    >
                       <Link href={`?collection=${item?.node.handle}`}>
                         {item?.node?.title}
                       </Link>

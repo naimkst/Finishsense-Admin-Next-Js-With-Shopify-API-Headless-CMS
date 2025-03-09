@@ -10,6 +10,7 @@ import {
   useCartCount,
   useLoader,
   useCollections,
+  useProducts,
 } from "@/stores/product-store";
 import { toFixed } from "@/lib/helpers";
 import { client } from "@/lib/shopifyBuy";
@@ -26,6 +27,7 @@ const Header = () => {
   const searchRouter = useSearchParams();
   const searchQuery = searchRouter.get("query");
   const router = useRouter();
+  const { setProducts, products } = useProducts();
 
   const removeItem = (item) => {
     setLoader(true);
@@ -100,6 +102,12 @@ const Header = () => {
     fetchCollections();
   }, [router.id]);
 
+  const getAllProduct = async () => {
+    await client.product.fetchAll().then((products) => {
+      setProducts(products);
+    });
+  };
+
   console.log("collections", collections);
   return (
     <>
@@ -108,7 +116,7 @@ const Header = () => {
           <div className="container-fluid">
             <div className="row align-items-center">
               <div className="col-lg-3 col-md-3 col-5">
-                <div className="navbar-header">
+                <div className="navbar-header" onClick={() => getAllProduct()}>
                   <Link className="navbar-brand site-logo" href="/">
                     <Image src={Logo} alt="" />
                   </Link>
@@ -147,7 +155,7 @@ const Header = () => {
                         </a>
                       </li>
                       <li>
-                        <a href="#">
+                        <a href="https://www.finishsense.io/pages/contact">
                           <i className="icon-contact"></i>
                         </a>
                       </li>
@@ -170,9 +178,6 @@ const Header = () => {
                           <a onClick={() => signOut()} href="#">
                             Sign Out
                           </a>
-                        </li>
-                        <li>
-                          <a href="#">Contact Us</a>
                         </li>
                       </ul>
                     </div>

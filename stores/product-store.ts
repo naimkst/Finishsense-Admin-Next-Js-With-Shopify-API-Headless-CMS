@@ -13,6 +13,12 @@ export const useCollections = create((set) => ({
   remove: () => set({ collections: [] }),
 }));
 
+export const useProducts = create((set) => ({
+  products: [],
+  setProducts: (products: any) => set(() => ({ products })),
+  remove: () => set({ products: [] }),
+}));
+
 export const useLoader = create((set) => ({
   loader: false,
   setLoader: (loader: boolean) => set(() => ({ loader })),
