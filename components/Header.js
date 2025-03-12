@@ -172,7 +172,7 @@ const Header = () => {
                     <div className="submenu">
                       <ul>
                         <li>
-                          <a href="#">Account Profile</a>
+                          <Link href="/profile">Account Profile</Link>
                         </li>
                         <li>
                           <a onClick={() => signOut()} href="#">
