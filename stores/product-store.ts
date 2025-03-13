@@ -13,6 +13,12 @@ export const useCollections = create((set) => ({
   remove: () => set({ collections: [] }),
 }));
 
+export const useUser = create((set) => ({
+  user: [],
+  setUser: (user: any) => set(() => ({ user })),
+  remove: () => set({ user: [] }),
+}));
+
 export const useProducts = create((set) => ({
   products: [],
   setProducts: (products: any) => set(() => ({ products })),

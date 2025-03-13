@@ -1,7 +1,7 @@
 import { parse } from "cookie";
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") {
+  if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       headers: {
         "Content-Type": "application/json",
         "X-Shopify-Access-Token":
-          process.env.NEXT_PUBLIC_SHOPIFY_PRIVATE_ACCESS_TOKEN,
+          process.env.NEXT_PUBLIC_SHOPIFY_PRIVATE_ACCESS_TOKEN, // Admin API Token
       },
       body: JSON.stringify({ query, variables }),
     });

@@ -7,10 +7,10 @@ import OutsideClickHandler from "react-outside-click-handler";
 import {
   useCart,
   useCartBar,
-  useCartCount,
   useLoader,
   useCollections,
   useProducts,
+  useUser,
 } from "@/stores/product-store";
 import { toFixed } from "@/lib/helpers";
 import { client } from "@/lib/shopifyBuy";
@@ -28,6 +28,7 @@ const Header = () => {
   const searchQuery = searchRouter.get("query");
   const router = useRouter();
   const { setProducts, products } = useProducts();
+  const { setUser, user } = useUser();
 
   const removeItem = (item) => {
     setLoader(true);
@@ -108,7 +109,18 @@ const Header = () => {
     });
   };
 
-  console.log("collections", collections);
+  const getCustomer = async () => {
+    console.log("customer");
+    const response = await fetch("/api/customer", {
+      method: "POST",
+    });
+    const data = await response.json();
+    setUser(data?.customer);
+  };
+  useEffect(() => {
+    getCustomer();
+  }, []);
+
   return (
     <>
       <header>
@@ -166,8 +178,10 @@ const Header = () => {
                       <Image src={profile} alt="" />
                     </div>
                     <div className="profile-text">
-                      <h4>Drew Heemstra</h4>
-                      <span>Area Manager</span>
+                      <h4>
+                        {user?.firstName} {user?.lastName}
+                      </h4>
+                      {/* <span>{user?.lastName}</span> */}
                     </div>
                     <div className="submenu">
                       <ul>

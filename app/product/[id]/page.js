@@ -16,7 +16,6 @@ import useFetch from "@/hooks/useFetch";
 import {
   useCart,
   useCartBar,
-  useCartCount,
   useLoader,
   useProductInfo,
 } from "@/stores/product-store";

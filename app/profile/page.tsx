@@ -6,9 +6,13 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
+import { useUser } from "@/stores/product-store";
 
 const Profile = () => {
   const [phone, setPhone] = React.useState("");
+  const { user }: any = useUser();
+
+  console.log(user);
   return (
     <div className="page-wrapper">
       <Header />
@@ -37,6 +41,7 @@ const Profile = () => {
                             name="name"
                             className="form-control"
                             placeholder="Name"
+                            value={user?.firstName}
                           />
                         </div>
                       </div>
@@ -50,6 +55,7 @@ const Profile = () => {
                             name="name"
                             className="form-control"
                             placeholder="Name"
+                            value={user?.lastName}
                           />
                         </div>
                       </div>
@@ -63,16 +69,17 @@ const Profile = () => {
                             name="name"
                             className="form-control"
                             placeholder="Name"
+                            value={user?.tags}
                           />
                         </div>
                       </div>
 
-                      <div className="col-12">
+                      <div className="col-12 phoneInput">
                         <div className="form-group">
                           <label htmlFor="phone">Phone</label>
                           <PhoneInput
                             country={"us"}
-                            value={phone}
+                            value={user?.defaultAddress?.phone}
                             onChange={(phone) => setPhone(phone)}
                             inputProps={{
                               name: "phone",
@@ -92,19 +99,21 @@ const Profile = () => {
                             name="email"
                             className="form-control"
                             placeholder="Email"
+                            value={user?.email}
                           />
                         </div>
                       </div>
 
                       <div className="col-12">
                         <div className="form-group">
-                          <label htmlFor="company">Compnay Name</label>
+                          <label htmlFor="company">Compnay/Display Name</label>
                           <input
                             type="text"
                             id="company"
                             name="company"
                             className="form-control"
                             placeholder="FinishSense"
+                            value={user?.displayName}
                           />
                         </div>
                       </div>
@@ -118,6 +127,7 @@ const Profile = () => {
                             name="address"
                             className="form-control"
                             placeholder="1309 Tanager Ave"
+                            value={user?.defaultAddress?.address1}
                           />
                         </div>
                       </div>
@@ -131,6 +141,7 @@ const Profile = () => {
                             name="address"
                             className="form-control"
                             placeholder="1309 Tanager Ave"
+                            value={user?.defaultAddress?.address2}
                           />
                         </div>
                       </div>
@@ -144,6 +155,7 @@ const Profile = () => {
                             name="city"
                             className="form-control"
                             placeholder="City"
+                            value={user?.defaultAddress?.city}
                           />
                         </div>
                       </div>
@@ -158,6 +170,7 @@ const Profile = () => {
                                 name="state"
                                 className="form-control"
                                 placeholder="State"
+                                value={user?.defaultAddress?.province}
                               />
                             </div>
                           </div>
@@ -170,13 +183,14 @@ const Profile = () => {
                                 name="zip"
                                 className="form-control"
                                 placeholder="Zip"
+                                value={user?.defaultAddress?.zip}
                               />
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="col-12">
+                      {/* <div className="col-12">
                         <div className="form-group">
                           <label htmlFor="taxinfo">Tax Information</label>
                           <input
@@ -185,9 +199,10 @@ const Profile = () => {
                             name="taxinfo"
                             className="form-control"
                             placeholder="Tax Exempt"
+                            value={user?.taxExempt}
                           />
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="col-12">
                         <div className="form-group">
@@ -196,6 +211,7 @@ const Profile = () => {
                             id="country"
                             name="country"
                             className="form-control"
+                            value={user?.defaultAddress?.country}
                           >
                             <option value="">Select Your Country</option>
                             <option value="Afghanistan">Afghanistan</option>
