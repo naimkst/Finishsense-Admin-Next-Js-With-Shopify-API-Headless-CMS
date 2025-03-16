@@ -55,6 +55,20 @@ export default async function handler(req, res) {
             longitude
             latitude
           }
+          metafield(namespace: "custom", key: "title"){ 
+            value
+            key
+          }
+          metafields(first: 100) {
+            edges {
+              node {
+                namespace
+                key
+                value
+                type
+              }
+            }
+          }
           orders(first: 50) {
             edges {
               node {
