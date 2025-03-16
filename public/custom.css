@@ -573,3 +573,7 @@ ul.submenu li:hover a {
 .accountProfile button:hover {
   background: #000;
 }
+.subMenu .activeMenu {
+  color: #000000 !important;
+  font-weight: 900 !important;
+}

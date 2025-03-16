@@ -8,29 +8,6 @@ import { client } from "@/lib/shopifyBuy";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const menus = [
-  // {
-  //   id: 1,
-  //   title: "Maintainable Assets",
-  //   link: "/maintain",
-  //   submenu: [
-  //     {
-  //       id: 11,
-  //       title: "Maintainable Assets",
-  //       link: "/maintain",
-  //     },
-  //     {
-  //       id: 12,
-  //       title: "Maintainable Assets",
-  //       link: "/maintain",
-  //     },
-  //     {
-  //       id: 13,
-  //       title: "Maintainable Assets",
-  //       link: "/maintain",
-  //     },
-  //   ],
-  // },
-
   {
     id: 3,
     title: "Recommended Spares",
@@ -57,11 +34,10 @@ const menus = [
 
 const SideBarMenu = () => {
   const [isToggled, setIsToggled] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
   const { collections } = useCollections();
   const { setProducts, products } = useProducts();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const search = searchParams.get("collection");
 
   const toggleClass = () => {
     setIsToggled(!isToggled);
@@ -103,6 +79,8 @@ const SideBarMenu = () => {
         setProducts(collection.products);
       });
   };
+
+  console.log("useSearchParams", search);
 
   return (
     <div className="side-bar-wrap">
@@ -164,7 +142,7 @@ const SideBarMenu = () => {
             <h2>Store Menu</h2>
           </div>
 
-          <div className="product-menu">
+          {/* <div className="product-menu">
             <Link
               href="/"
               className={`${isOpen ? "active" : null}`}
@@ -191,7 +169,65 @@ const SideBarMenu = () => {
                 })}
               </ul>
             )}
+          </div> */}
+
+          <div className="main-menu">
+            {menus.map((item, mn) => {
+              return (
+                <ListItem
+                  className={item.id === openId ? "active" : null}
+                  key={mn}
+                >
+                  {item.submenu ? (
+                    <Fragment>
+                      <p
+                        onClick={() =>
+                          setOpenId(item.id === openId ? 0 : item.id)
+                        }
+                      >
+                        All Products
+                        <i
+                          className={item.id === openId ? "icon-07" : "icon-07"}
+                        ></i>
+                      </p>
+                      <Collapse
+                        in={item.id === openId}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <List className="subMenu">
+                          <Fragment>
+                            {collections.map((item, i) => {
+                              return (
+                                <ListItem key={i}>
+                                  <Link
+                                    className={`${
+                                      search === item?.node.handle
+                                        ? "activeMenu"
+                                        : null
+                                    }`}
+                                    onClick={() =>
+                                      getProductByCollection(item?.node?.id)
+                                    }
+                                    href={`?collection=${item?.node.handle}`}
+                                  >
+                                    {item?.node?.title}
+                                  </Link>
+                                </ListItem>
+                              );
+                            })}
+                          </Fragment>
+                        </List>
+                      </Collapse>
+                    </Fragment>
+                  ) : (
+                    ""
+                  )}
+                </ListItem>
+              );
+            })}
           </div>
+
           <div className="main-menu">
             {menus.map((item, mn) => {
               return (
