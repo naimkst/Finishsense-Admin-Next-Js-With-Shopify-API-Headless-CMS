@@ -80,8 +80,6 @@ const SideBarMenu = () => {
       });
   };
 
-  console.log("useSearchParams", search);
-
   return (
     <div className="side-bar-wrap">
       <div className="sidebarleft">

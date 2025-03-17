@@ -121,6 +121,28 @@ const Header = () => {
     getCustomer();
   }, []);
 
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     await fetch("/api/createCart", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     })
+  //       .then((response) =>
+  //         response.json().then((data) => {
+  //           cartUpdate(data?.data);
+  //         })
+  //       )
+  //       .catch((error) => {
+  //         console.error("Failed to fetch product metafields:", error);
+  //       });
+  //   };
+  //   fetchProducts();
+  // }, []);
+
+  console.log("@@@@@@@@@@@@@@@@@@", cart);
+
   return (
     <>
       <header>
@@ -224,10 +246,10 @@ const Header = () => {
           </button>
           <div className="mini-cart-items">
             <p className="top-p">
-              Your Cart ({cart?.lineItems ? cart?.lineItems.length : 0})
+              Your Cart ({cart?.lines?.edges ? cart?.lines?.edges?.length : 0})
             </p>
 
-            {cart?.lineItems?.map((item, index) => (
+            {cart?.lines?.edges?.map((item, index) => (
               <div
                 key={`cartItem-${index}`}
                 className="mini-cart-item clearfix"
@@ -235,7 +257,7 @@ const Header = () => {
                 <div className="mini-cart-item-image">
                   <a href="shop.html">
                     <img
-                      src={item?.variant?.image.src}
+                      src={item?.node?.merchandise?.image.url}
                       width={100}
                       height={100}
                       alt=""
@@ -244,28 +266,30 @@ const Header = () => {
                 </div>
                 <div className="mini-cart-item-des">
                   <h4>
-                    <a href="product-single.html">{item?.title}</a>
+                    <a href="product-single.html">
+                      {item?.node?.merchandise?.product?.title}
+                    </a>
                   </h4>
                   <ul className="product-text-sub">
-                    <li>SKU:{item?.variant?.sku}</li>
+                    <li>SKU:{item?.node?.merchandise?.sku}</li>
                   </ul>
                   <a
                     href="#"
                     className="dlt-btn"
-                    onClick={() => removeItem(item?.id)}
+                    onClick={() => removeItem(item?.node?.id)}
                   >
                     <i className="ti-trash"></i>
                   </a>
                 </div>
                 <div className="pro-single-btn">
                   <span className="price">
-                    {item?.variant?.price?.currencyCode == "USD"
+                    {item?.node?.merchandise?.price?.currencyCode == "USD"
                       ? "$"
-                      : item?.variant?.price?.currencyCode}
-                    {toFixed(item?.variant?.price?.amount)}
+                      : item?.node?.merchandise?.price?.currencyCode}
+                    {toFixed(item?.node?.merchandise?.price?.amount)}
                   </span>
                   <div className="quantity cart-plus-minus">
-                    <input type="text" value={item?.quantity} />
+                    <input type="text" value={item?.node?.quantity} />
                     <div className="dec qtybutton"></div>
                     <div className="inc qtybutton"></div>
                     {loader ? (
@@ -273,7 +297,9 @@ const Header = () => {
                     ) : (
                       <div
                         className="dec qtybutton"
-                        onClick={() => updateItem(item?.id, item?.quantity - 1)}
+                        onClick={() =>
+                          updateItem(item?.node?.id, item?.node?.quantity - 1)
+                        }
                       >
                         -
                       </div>
@@ -285,7 +311,9 @@ const Header = () => {
                     ) : (
                       <div
                         className="dec qtybutton"
-                        onClick={() => updateItem(item?.id, item?.quantity - 1)}
+                        onClick={() =>
+                          updateItem(item?.node?.id, item?.node?.quantity - 1)
+                        }
                       >
                         -
                       </div>
@@ -296,7 +324,9 @@ const Header = () => {
                     ) : (
                       <div
                         className="inc qtybutton"
-                        onClick={() => updateItem(item?.id, item?.quantity + 1)}
+                        onClick={() =>
+                          updateItem(item?.node?.id, item?.node?.quantity + 1)
+                        }
                       >
                         +
                       </div>
@@ -309,14 +339,15 @@ const Header = () => {
           <div className="mini-cart-action clearfix">
             <ul>
               <li>
-                Subtotal ({cart?.lineItems ? cart?.lineItems.length : 0}) items{" "}
+                Subtotal ({cart?.lines?.edges ? cart?.lines?.edges?.length : 0})
+                items{" "}
               </li>
               <li>
                 <strong>
-                  {cart?.subtotalPrice?.currencyCode == "USD"
+                  {cart?.cost?.subtotalAmount?.currencyCode == "USD"
                     ? "$"
-                    : cart?.subtotalPrice?.currencyCode}
-                  {toFixed(cart?.subtotalPrice?.amount)}
+                    : cart?.cost?.subtotalAmount?.currencyCode}
+                  {toFixed(cart?.cost?.subtotalAmount?.amount)}
                 </strong>
               </li>
             </ul>
@@ -326,7 +357,7 @@ const Header = () => {
                   Loading...
                 </a>
               ) : (
-                <a href={cart?.webUrl} className="view-cart-btn">
+                <a href={cart?.checkoutUrl} className="view-cart-btn">
                   CONTINUE TO CHECKOUT
                 </a>
               )}

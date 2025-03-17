@@ -31,6 +31,10 @@ const productDetails = () => {
   const { cartBarUpdate } = useCartBar();
   const { loader, setLoader } = useLoader();
 
+  console.log("cart", cart);
+
+  console.log("checkout======", products);
+
   const {
     loading,
     error,
@@ -132,6 +136,33 @@ const productDetails = () => {
     }
   };
 
+  async function addToCarts(cartId, variantId, quantity) {
+    setLoader(true);
+    try {
+      const response = await fetch("/api/cartAdd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartId, variantId, quantity }),
+      });
+
+      const result = await response.json();
+      if (result.error) {
+        console.error("Shopify Error:", result.details);
+      } else {
+        console.log("Cart Updated:====", result.data);
+        cartUpdate(result?.data);
+        cartBarUpdate(true);
+        setLoader(false);
+        toast.success("Item added to cart.");
+        setLoader(false);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
+  }
+
+  // Example Usage
+
   if (!products || loading) return <Loader />;
 
   return (
@@ -226,7 +257,16 @@ const productDetails = () => {
                         </Button>
                       </Grid>
                     </div>
-                    <div className="cart-btn" onClick={() => addToCart()}>
+                    <div
+                      className="cart-btn"
+                      onClick={() =>
+                        addToCarts(
+                          cart?.id,
+                          products?.variants?.edges[0]?.node?.id,
+                          qty
+                        )
+                      }
+                    >
                       {loader ? "Loading..." : "Add To Cart"}
                     </div>
                   </div>
