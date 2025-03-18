@@ -32,7 +32,7 @@ const Header = () => {
 
   const removeItem = (item) => {
     setLoader(true);
-    if (!cart || cart.lineItems.length === 0) {
+    if (!cart || cart?.lines?.edges?.length === 0) {
       console.error("Cart is empty or does not exist.");
       return;
     }
@@ -178,7 +178,9 @@ const Header = () => {
                         <a href="#" onClick={() => cartBarUpdate(true)}>
                           <i className="icon-cart25"></i>
                           <span>
-                            {cart?.lineItems ? cart?.lineItems.length : 0}
+                            {cart?.lines?.edges?.length
+                              ? cart?.lines?.edges?.length
+                              : 0}
                           </span>
                         </a>
                       </li>
