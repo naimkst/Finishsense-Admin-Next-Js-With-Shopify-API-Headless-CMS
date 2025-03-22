@@ -31,7 +31,7 @@ const productDetails = () => {
   const { cartBarUpdate } = useCartBar();
   const { loader, setLoader } = useLoader();
 
-  console.log("cart", cart);
+  console.log("cart=========", cart);
 
   console.log("checkout======", products);
 
@@ -74,67 +74,6 @@ const productDetails = () => {
       setProductInfo(getInfoData);
     }
   }, [getProductInfo, router.id]);
-
-  const addToCart = async () => {
-    setLoader(true);
-    console.info("product", products);
-    console.info("product", products?.variants?.edges[0]?.node?.id);
-    const lineItemsToAdd = [
-      {
-        variantId: products?.variants?.edges[0]?.node?.id,
-        quantity: qty,
-      },
-    ];
-
-    console.log("lineItemsToAdd", Object.keys(cart).length);
-
-    try {
-      if (Object.keys(cart).length == 0) {
-        client.checkout
-          .create()
-          .then((checkout) => {
-            const checkoutId = checkout?.id;
-            client.checkout
-              .addLineItems(checkoutId, lineItemsToAdd)
-              .then((checkout) => {
-                cartUpdate(checkout);
-                cartBarUpdate(true);
-                setLoader(false);
-                toast.success("Item added to cart.");
-              })
-              .catch((error) => {
-                console.log("Failed to add item in cart");
-                setLoader(false);
-                toast.error("Failed to add item in cart");
-              });
-          })
-          .catch((error) => {
-            console.log("Error creating checkout");
-            setLoader(false);
-            toast.error("Error creating checkout");
-          });
-      } else {
-        const checkoutId = cart.id;
-        client.checkout
-          .addLineItems(checkoutId, lineItemsToAdd)
-          .then((checkout) => {
-            cartUpdate(checkout);
-            cartBarUpdate(true);
-            setLoader(false);
-            toast.success("Item added to cart.");
-          })
-          .catch((error) => {
-            console.error("Error adding line items:", error);
-            setLoader(false);
-            toast.error("Failed to add item in cart");
-          });
-      }
-    } catch (error) {
-      console.log("Failed to add item in cart");
-      setLoader(false);
-      toast.error("Failed to add item in cart");
-    }
-  };
 
   async function addToCarts(cartId, variantId, quantity) {
     setLoader(true);

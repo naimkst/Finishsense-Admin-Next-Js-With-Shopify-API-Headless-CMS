@@ -29,27 +29,46 @@ const Header = () => {
   const router = useRouter();
   const { setProducts, products } = useProducts();
   const { setUser, user } = useUser();
+  const [isClient, setIsClient] = useState(false);
 
-  const removeItem = (item) => {
+  const removeItem = async (item, qty) => {
     setLoader(true);
+
     if (!cart || cart?.lines?.edges?.length === 0) {
       console.error("Cart is empty or does not exist.");
+      setLoader(false);
       return;
     }
+
     const checkoutId = cart.id;
 
-    client.checkout
-      .removeLineItems(checkoutId, [item])
-      .then((checkout) => {
-        cartUpdate(checkout);
-        toast.success("Item removed from cart.");
-        setLoader(false);
-      })
-      .catch((error) => {
-        console.error("Error removing line item:", error);
-        toast.error("Oops! Something went wrong. Please try again.");
-        setLoader(false);
+    try {
+      const response = await fetch("/api/updateCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartId: checkoutId,
+          lineId: item,
+          quantity: qty,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
+      }
+
+      const data = await response.json();
+      console.log("Remove Item Response:", data);
+      cartUpdate(data?.data);
+      toast.success("Item removed from cart.");
+    } catch (error) {
+      console.error("Error removing line item:", error);
+      toast.error("Oops! Something went wrong. Please try again.");
+    } finally {
+      setLoader(false);
+    }
   };
 
   const updateItem = (item, quantity) => {
@@ -119,255 +138,264 @@ const Header = () => {
   };
   useEffect(() => {
     getCustomer();
+    setIsClient(true);
   }, []);
 
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     await fetch("/api/createCart", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     })
-  //       .then((response) =>
-  //         response.json().then((data) => {
-  //           cartUpdate(data?.data);
-  //         })
-  //       )
-  //       .catch((error) => {
-  //         console.error("Failed to fetch product metafields:", error);
-  //       });
-  //   };
-  //   fetchProducts();
-  // }, []);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      await fetch("/api/createCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) =>
+          response.json().then((data) => {
+            cartUpdate(data?.data);
+          })
+        )
+        .catch((error) => {
+          console.error("Failed to fetch product metafields:", error);
+        });
+    };
+    if (!cart) fetchProducts();
+  }, []);
 
   console.log("@@@@@@@@@@@@@@@@@@", cart);
 
   return (
-    <>
-      <header>
-        <div className="main-header" id="sticky-header">
-          <div className="container-fluid">
-            <div className="row align-items-center">
-              <div className="col-lg-3 col-md-3 col-5">
-                <div className="navbar-header" onClick={() => getAllProduct()}>
-                  <Link className="navbar-brand site-logo" href="/">
-                    <Image src={Logo} alt="" />
-                  </Link>
+    isClient && (
+      <>
+        <header>
+          <div className="main-header" id="sticky-header">
+            <div className="container-fluid">
+              <div className="row align-items-center">
+                <div className="col-lg-3 col-md-3 col-5">
+                  <div
+                    className="navbar-header"
+                    onClick={() => getAllProduct()}
+                  >
+                    <Link className="navbar-brand site-logo" href="/">
+                      <Image src={Logo} alt="" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-              <div className="col-lg-9 col-md-9 col-7">
-                <div className="header-right">
-                  <div className="search">
-                    <form onSubmit={handleSearch}>
-                      <input
-                        type="text"
-                        placeholder="search..."
-                        className="form-control input-sm r-10 input-bg-none"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                      />
-                      <button className="search-btn" type="submit">
-                        <i className="fa fa-search"></i>
-                      </button>
-                    </form>
-                  </div>
-                  <div className="right-info">
-                    <ul>
-                      <li>
-                        <a href="#" onClick={() => cartBarUpdate(true)}>
-                          <i className="icon-cart25"></i>
-                          <span>
-                            {cart?.lines?.edges?.length
-                              ? cart?.lines?.edges?.length
-                              : 0}
-                          </span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <i className="icon-bell"></i>
-                          <span>2</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.finishsense.io/pages/contact">
-                          <i className="icon-contact"></i>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="right-profile">
-                    <div className="profile-img">
-                      <Image src={profile} alt="" />
+                <div className="col-lg-9 col-md-9 col-7">
+                  <div className="header-right">
+                    <div className="search">
+                      <form onSubmit={handleSearch}>
+                        <input
+                          type="text"
+                          placeholder="search..."
+                          className="form-control input-sm r-10 input-bg-none"
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                        />
+                        <button className="search-btn" type="submit">
+                          <i className="fa fa-search"></i>
+                        </button>
+                      </form>
                     </div>
-                    <div className="profile-text">
-                      <h4>
-                        {user?.firstName} {user?.lastName}
-                      </h4>
-                      {/* <span>{user?.lastName}</span> */}
-                    </div>
-                    <div className="submenu">
+                    <div className="right-info">
                       <ul>
                         <li>
-                          <Link href="/profile">Account Profile</Link>
+                          <a href="#" onClick={() => cartBarUpdate(true)}>
+                            <i className="icon-cart25"></i>
+                            {cart?.lines?.edges?.length ? (
+                              <span>{cart?.lines?.edges?.length}</span>
+                            ) : (
+                              <span>{"0"}</span>
+                            )}
+                          </a>
                         </li>
                         <li>
-                          <a onClick={() => signOut()} href="#">
-                            Sign Out
+                          <a href="#">
+                            <i className="icon-bell"></i>
+                            <span>2</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.finishsense.io/pages/contact">
+                            <i className="icon-contact"></i>
                           </a>
                         </li>
                       </ul>
                     </div>
+                    <div className="right-profile">
+                      <div className="profile-img">
+                        <Image src={profile} alt="" />
+                      </div>
+                      <div className="profile-text">
+                        <h4>
+                          {user?.firstName} {user?.lastName}
+                        </h4>
+                        {/* <span>{user?.lastName}</span> */}
+                      </div>
+                      <div className="submenu">
+                        <ul>
+                          <li>
+                            <Link href="/profile">Account Profile</Link>
+                          </li>
+                          <li>
+                            <a onClick={() => signOut()} href="#">
+                              Sign Out
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <OutsideClickHandler
-        onOutsideClick={() => {
-          cartBarUpdate(false);
-        }}
-      >
-        <div
-          className={`mini-cart-content ${
-            cartShow ? " mini-cart-content-toggle" : ""
-          }`}
+        <OutsideClickHandler
+          onOutsideClick={() => {
+            cartBarUpdate(false);
+          }}
         >
-          <div className="title"></div>
-          <button
-            className="mini-cart-close"
-            onClick={() => {
-              cartBarUpdate(false);
-            }}
+          <div
+            className={`mini-cart-content ${
+              cartShow ? " mini-cart-content-toggle" : ""
+            }`}
           >
-            <i className="ti-close"></i>
-          </button>
-          <div className="mini-cart-items">
-            <p className="top-p">
-              Your Cart ({cart?.lines?.edges ? cart?.lines?.edges?.length : 0})
-            </p>
+            <div className="title"></div>
+            <button
+              className="mini-cart-close"
+              onClick={() => {
+                cartBarUpdate(false);
+              }}
+            >
+              <i className="ti-close"></i>
+            </button>
+            <div className="mini-cart-items">
+              <p className="top-p">
+                Your Cart ({cart?.lines?.edges ? cart?.lines?.edges?.length : 0}
+                )
+              </p>
 
-            {cart?.lines?.edges?.map((item, index) => (
-              <div
-                key={`cartItem-${index}`}
-                className="mini-cart-item clearfix"
-              >
-                <div className="mini-cart-item-image">
-                  <a href="shop.html">
-                    <img
-                      src={item?.node?.merchandise?.image.url}
-                      width={100}
-                      height={100}
-                      alt=""
-                    />
-                  </a>
-                </div>
-                <div className="mini-cart-item-des">
-                  <h4>
-                    <a href="product-single.html">
-                      {item?.node?.merchandise?.product?.title}
+              {cart?.lines?.edges?.map((item, index) => (
+                <div
+                  key={`cartItem-${index}`}
+                  className="mini-cart-item clearfix"
+                >
+                  <div className="mini-cart-item-image">
+                    <a href="shop.html">
+                      <img
+                        src={item?.node?.merchandise?.image.url}
+                        width={100}
+                        height={100}
+                        alt=""
+                      />
                     </a>
-                  </h4>
-                  <ul className="product-text-sub">
-                    <li>SKU:{item?.node?.merchandise?.sku}</li>
-                  </ul>
-                  <a
-                    href="#"
-                    className="dlt-btn"
-                    onClick={() => removeItem(item?.node?.id)}
-                  >
-                    <i className="ti-trash"></i>
-                  </a>
-                </div>
-                <div className="pro-single-btn">
-                  <span className="price">
-                    {item?.node?.merchandise?.price?.currencyCode == "USD"
-                      ? "$"
-                      : item?.node?.merchandise?.price?.currencyCode}
-                    {toFixed(item?.node?.merchandise?.price?.amount)}
-                  </span>
-                  <div className="quantity cart-plus-minus">
-                    <input type="text" value={item?.node?.quantity} />
-                    <div className="dec qtybutton"></div>
-                    <div className="inc qtybutton"></div>
-                    {loader ? (
-                      <div className="dec qtybutton">-</div>
-                    ) : (
-                      <div
-                        className="dec qtybutton"
-                        onClick={() =>
-                          updateItem(item?.node?.id, item?.node?.quantity - 1)
-                        }
-                      >
-                        -
-                      </div>
-                    )}
+                  </div>
+                  <div className="mini-cart-item-des">
+                    <h4>
+                      <a href="product-single.html">
+                        {item?.node?.merchandise?.product?.title}
+                      </a>
+                    </h4>
+                    <ul className="product-text-sub">
+                      {item?.node?.merchandise?.sku && (
+                        <li>SKU:{item?.node?.merchandise?.sku}</li>
+                      )}
+                    </ul>
+                    <a
+                      href="#"
+                      className="dlt-btn"
+                      onClick={() => removeItem(item?.node?.id, 0)}
+                    >
+                      <i className="ti-trash"></i>
+                    </a>
+                  </div>
+                  <div className="pro-single-btn">
+                    <span className="price">
+                      {item?.node?.merchandise?.price?.currencyCode == "USD"
+                        ? "$"
+                        : item?.node?.merchandise?.price?.currencyCode}
+                      {toFixed(item?.node?.merchandise?.price?.amount)}
+                    </span>
+                    <div className="quantity cart-plus-minus">
+                      <input type="text" value={item?.node?.quantity} />
+                      <div className="dec qtybutton"></div>
+                      <div className="inc qtybutton"></div>
+                      {loader ? (
+                        <div className="dec qtybutton">-</div>
+                      ) : (
+                        <div
+                          className="dec qtybutton"
+                          onClick={() =>
+                            removeItem(item?.node?.id, item?.node?.quantity - 1)
+                          }
+                        >
+                          -
+                        </div>
+                      )}
 
-                    <div className="inc qtybutton">+</div>
-                    {loader ? (
-                      <div className="dec qtybutton">-</div>
-                    ) : (
-                      <div
-                        className="dec qtybutton"
-                        onClick={() =>
-                          updateItem(item?.node?.id, item?.node?.quantity - 1)
-                        }
-                      >
-                        -
-                      </div>
-                    )}
-
-                    {loader ? (
                       <div className="inc qtybutton">+</div>
-                    ) : (
-                      <div
-                        className="inc qtybutton"
-                        onClick={() =>
-                          updateItem(item?.node?.id, item?.node?.quantity + 1)
-                        }
-                      >
-                        +
-                      </div>
-                    )}
+                      {loader ? (
+                        <div className="dec qtybutton">-</div>
+                      ) : (
+                        <div
+                          className="dec qtybutton"
+                          onClick={() =>
+                            removeItem(item?.node?.id, item?.node?.quantity - 1)
+                          }
+                        >
+                          -
+                        </div>
+                      )}
+
+                      {loader ? (
+                        <div className="inc qtybutton">+</div>
+                      ) : (
+                        <div
+                          className="inc qtybutton"
+                          onClick={() =>
+                            removeItem(item?.node?.id, item?.node?.quantity + 1)
+                          }
+                        >
+                          +
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+            <div className="mini-cart-action clearfix">
+              <ul>
+                <li>
+                  Subtotal (
+                  {cart?.lines?.edges ? cart?.lines?.edges?.length : 0}) items{" "}
+                </li>
+                <li>
+                  <strong>
+                    {cart?.cost?.subtotalAmount?.currencyCode == "USD"
+                      ? "$"
+                      : cart?.cost?.subtotalAmount?.currencyCode}
+                    {toFixed(cart?.cost?.subtotalAmount?.amount)}
+                  </strong>
+                </li>
+              </ul>
+              <div className="mini-btn">
+                {loader ? (
+                  <a href="#" className="view-cart-btn">
+                    Loading...
+                  </a>
+                ) : (
+                  <a href={cart?.checkoutUrl} className="view-cart-btn">
+                    CONTINUE TO CHECKOUT
+                  </a>
+                )}
               </div>
-            ))}
-          </div>
-          <div className="mini-cart-action clearfix">
-            <ul>
-              <li>
-                Subtotal ({cart?.lines?.edges ? cart?.lines?.edges?.length : 0})
-                items{" "}
-              </li>
-              <li>
-                <strong>
-                  {cart?.cost?.subtotalAmount?.currencyCode == "USD"
-                    ? "$"
-                    : cart?.cost?.subtotalAmount?.currencyCode}
-                  {toFixed(cart?.cost?.subtotalAmount?.amount)}
-                </strong>
-              </li>
-            </ul>
-            <div className="mini-btn">
-              {loader ? (
-                <a href="#" className="view-cart-btn">
-                  Loading...
-                </a>
-              ) : (
-                <a href={cart?.checkoutUrl} className="view-cart-btn">
-                  CONTINUE TO CHECKOUT
-                </a>
-              )}
             </div>
           </div>
-        </div>
-      </OutsideClickHandler>
-    </>
+        </OutsideClickHandler>
+      </>
+    )
   );
 };
 
