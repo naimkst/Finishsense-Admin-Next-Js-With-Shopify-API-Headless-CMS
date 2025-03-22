@@ -71,29 +71,6 @@ const Header = () => {
     }
   };
 
-  const updateItem = (item, quantity) => {
-    setLoader(true);
-    if (!cart || cart.lineItems.length === 0) {
-      console.error("Cart is empty or does not exist.");
-      toast.error("Cart is empty or does not exist.");
-      return;
-    }
-    const lineItemsToUpdate = [{ id: item, quantity: quantity }];
-    client.checkout
-      .updateLineItems(cart?.id, lineItemsToUpdate)
-      .then((checkout) => {
-        cartUpdate(checkout);
-        console.log(checkout.lineItems);
-        toast.success("Item updated in cart.");
-        setLoader(false);
-      })
-      .catch((error) => {
-        console.error("Error updating line item:", error);
-        toast.error("Oops! Something went wrong. Please try again.");
-        setLoader(false);
-      });
-  };
-
   const handleSearch = (e) => {
     e.preventDefault();
     router.push(`/search/?query=${query}`);
